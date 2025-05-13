@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content-Visibility 与 Contain-Intrinsic-Size 示例</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* 应用 content-visibility 的部分 */
+        .with-cv {
+            content-visibility: auto;
+            contain-intrinsic-size: 0 500px; /* 预估高度为500px */
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        /* 高度指示器样式 */
+        .height-indicator {
+            position: absolute;
+            right: -10px;
+            width: 4px;
+            background-color: rgba(33, 150, 243, 0.5);
+            z-index: 5;
+            pointer-events: none;
+            transition: height 0.3s, box-shadow 0.3s;
+        }
+        
+        .actual-height-indicator {
+            background-color: rgba(76, 175, 80, 0.7);
+            left: -10px;
+        }
+        
+        .section.with-cv {
+            position: relative;
+            overflow: visible;
+        }
+        
+        /* 演示区域样式增强 */
+        .demo-content {
+            transition: contain-intrinsic-size 0.3s;
+            position: relative;
+        }
+        
+        .height-difference-label {
+            position: absolute;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .scrollbar-highlight {
+            position: absolute;
+            right: 0;
+            width: 12px;
+            background-color: rgba(255, 193, 7, 0.3);
+            border-radius: 6px;
+            z-index: 9;
+            pointer-events: none;
+            transition: height 0.3s, top 0.3s;
+        }
+
+        /* 图片和内容样式 */
+        .content-block {
+            margin-bottom: 15px;
+        }
+
+        .content-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .performance-meter {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        #scrollInfo {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            right: 20px;
+            width: 8px;
+            height: 100px;
+            background-color: rgba(76, 175, 80, 0.5);
+            border-radius: 4px;
+            z-index: 999;
+            transition: background-color 0.3s;
+        }
+        
+        .scroll-indicator.active {
+            background-color: rgba(76, 175, 80, 1);
+        }
+        
+        .render-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #f44336;
+            transition: background-color 0.5s;
+        }
+        
+        .rendered .render-indicator {
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Content-Visibility 与 Contain-Intrinsic-Size 示例</h1>
+        <p>这个示例展示了 content-visibility 和 contain-intrinsic-size CSS 属性如何提高页面性能</p>
+    </header>
+
+    <div class="info-box">
+        <h3>什么是 content-visibility?</h3>
+        <p><strong>content-visibility</strong> 是一个 CSS 属性，它允许浏览器跳过不在视口内的元素的渲染工作，从而提高页面加载和渲染性能。</p>
+        <p><strong>contain-intrinsic-size</strong> 属性与 content-visibility 配合使用，为元素提供一个预估的大小，防止滚动条在元素进入视口并渲染时跳动。</p>
+    </div>
+
+    <div class="controls">
+        <button id="toggleCV">切换 content-visibility</button>
+        <button id="scrollToBottom">滚动到底部</button>
+        <button id="scrollToTop">滚动到顶部</button>
+    </div>
+    
+    <div class="info-box" style="background-color: #fff3cd; border-left-color: #ffc107;">
+        <h3>contain-intrinsic-size 调整面板</h3>
+        <p>通过调整下方滑块，可以改变 <code>contain-intrinsic-size</code> 的高度值，观察其对页面布局和滚动行为的影响。</p>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+            <label for="intrinsicSizeSlider">高度值 (px):</label>
+            <input type="range" id="intrinsicSizeSlider" min="100" max="1000" value="500" step="50" style="flex-grow: 1;">
+            <span id="intrinsicSizeValue">500px</span>
+        </div>
+        <div style="margin-top: 10px;">
+            <label><input type="checkbox" id="showHeightIndicators" checked> 显示高度指示器</label>
+            <div style="margin-top: 5px; display: flex; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="display: inline-block; width: 12px; height: 12px; background-color: rgba(33, 150, 243, 0.5);"></span>
+                    <span>预估高度</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="display: inline-block; width: 12px; height: 12px; background-color: rgba(76, 175, 80, 0.7);"></span>
+                    <span>实际高度</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div>
+            <h2>左侧：使用 content-visibility: auto</h2>
+            <div id="withCV">
+                <!-- 20个内容块，应用了content-visibility -->
+                <div class="section with-cv">
+                    <h2>Section 1 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 1</div>
+                        <p>这个部分应用了 <code>content-visibility: auto</code> 和 <code>contain-intrinsic-size: 0 500px</code>。当它不在视口中时，浏览器会跳过渲染，但会保留预估的空间大小，防止滚动条跳动。</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 2 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 2</div>
+                        <p>当用户滚动到这个部分时，浏览器会开始渲染它的内容。这种按需渲染的方式可以显著提高页面的初始加载性能，特别是对于长页面或内容复杂的页面。</p>
+                        <p>Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor.</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 3 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 3</div>
+                        <p>content-visibility 属性有三个可能的值：</p>
+                        <ul>
+                            <li><strong>visible</strong>：默认值，正常渲染元素</li>
+                            <li><strong>hidden</strong>：元素不渲染，类似于 display: none</li>
+                            <li><strong>auto</strong>：如果元素不在视口中，则跳过其内容的渲染</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 4 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 4</div>
+                        <p>contain-intrinsic-size 属性为元素提供一个预估的大小，格式为：contain-intrinsic-size: [width] [height]。</p>
+                        <p>这个预估大小在元素实际渲染前用于计算布局，防止在元素进入视口并渲染时页面布局发生突然变化。</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 5 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 5</div>
+                        <p>使用 content-visibility 的主要优势：</p>
+                        <ul>
+                            <li>提高页面初始加载速度</li>
+                            <li>减少不必要的渲染工作</li>
+                            <li>改善长页面的滚动性能</li>
+                            <li>降低内存使用量</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 6 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 6</div>
+                        <p>需要注意的是，content-visibility: auto 不会阻止内容的下载，只会延迟其渲染。例如，图片仍然会被下载，但不会被渲染直到元素进入视口。</p>
+                        <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae.</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 7 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 7</div>
+                        <p>content-visibility 与 CSS containment 规范相关，它实际上是应用了 contain: layout paint style 的组合，但增加了基于视口的条件渲染。</p>
+                        <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 8 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 8</div>
+                        <p>浏览器兼容性：content-visibility 是一个相对较新的 CSS 属性，目前主要在 Chrome 85+ 和基于 Chromium 的浏览器中得到支持。</p>
+                        <p>在不支持的浏览器中，这个属性会被忽略，页面会正常渲染，但不会获得性能优势。</p>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 9 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 9</div>
+                        <p>content-visibility: auto 对于以下场景特别有用：</p>
+                        <ul>
+                            <li>长滚动页面</li>
+                            <li>内容密集型应用</li>
+                            <li>包含大量图片或复杂 DOM 的页面</li>
+                            <li>社交媒体 feed 或新闻列表</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section with-cv">
+                    <h2>Section 10 (with content-visibility)</h2>
+                    <div class="render-indicator" title="渲染状态指示器"></div>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 10</div>
+                        <p>使用 content-visibility 时的注意事项：</p>
+                        <ul>
+                            <li>不要在频繁变化视口位置的元素上使用</li>
+                            <li>对于关键内容，考虑不使用此属性以确保立即渲染</li>
+                            <li>始终搭配 contain-intrinsic-size 使用，以避免滚动问题</li>
+                            <li>测试在各种设备和浏览器上的效果</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>右侧：不使用 content-visibility</h2>
+            <div id="withoutCV">
+                <!-- 10个内容块，没有应用content-visibility -->
+                <div class="section">
+                    <h2>Section 1 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 1</div>
+                        <p>这个部分没有应用 content-visibility 属性。无论它是否在视口中，浏览器都会渲染它的内容。</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 2 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 2</div>
+                        <p>对于没有应用 content-visibility 的元素，浏览器会在页面加载时立即渲染所有内容，即使用户可能永远不会滚动到这些内容。</p>
+                        <p>Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 3 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 3</div>
+                        <p>传统的渲染方式会消耗更多的初始资源，特别是对于长页面或内容复杂的页面。这可能导致页面加载速度变慢，初始交互延迟增加。</p>
+                        <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 4 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 4</div>
+                        <p>对比左右两侧的内容，你可以注意到：</p>
+                        <ul>
+                            <li>初始页面加载时的性能差异</li>
+                            <li>滚动时的渲染行为差异</li>
+                            <li>内存使用的差异</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 5 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 5</div>
+                        <p>在不支持 content-visibility 的浏览器中，两侧的内容会表现相同，都会在页面加载时完全渲染。</p>
+                        <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 6 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 6</div>
+                        <p>传统的优化方法包括：</p>
+                        <ul>
+                            <li>懒加载图片和其他资源</li>
+                            <li>代码分割和按需加载</li>
+                            <li>虚拟滚动（对于列表和表格）</li>
+                            <li>减少 DOM 大小和复杂度</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 7 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 7</div>
+                        <p>content-visibility 可以与这些传统优化方法结合使用，进一步提高页面性能。</p>
+                        <p>Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 8 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 8</div>
+                        <p>对于关键内容或首屏内容，通常不建议使用 content-visibility: auto，因为这些内容应该立即渲染以提供良好的用户体验。</p>
+                        <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 9 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 9</div>
+                        <p>在实际应用中，可以根据内容的重要性和位置，选择性地应用 content-visibility 属性，以平衡性能和用户体验。</p>
+                        <p>Cras mattis consectetur purus sit amet fermentum. Donec id elit non mi porta gravida at eget metus.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Section 10 (without content-visibility)</h2>
+                    <div class="content-block">
+                        <div class="placeholder">图片占位符 10</div>
+                        <p>总结：content-visibility 是一个强大的性能优化工具，特别是对于长页面和内容密集型应用。与 contain-intrinsic-size 结合使用可以提供更好的用户体验。</p>
+                        <p>随着浏览器支持的增加，它将成为前端开发者工具箱中的重要工具。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="performance-meter">
+        <h3>性能对比</h3>
+        <p>尝试快速滚动页面，观察两侧内容的渲染行为差异。左侧使用了 content-visibility: auto 的内容只有在接近或进入视口时才会渲染，而右侧的内容在页面加载时就全部渲染了。</p>
+        <p><strong>视觉指示器说明：</strong></p>
+        <ul>
+            <li><strong>红色圆点</strong>：表示该区块尚未渲染</li>
+            <li><strong>绿色圆点</strong>：表示该区块已经渲染</li>
+            <li><strong>右侧滚动条指示器</strong>：显示当前滚动位置在页面中的大致区域</li>
+            <li><strong>透明度和位移效果</strong>：当元素进入视口并渲染时的过渡动画</li>
+            <li><strong>蓝色竖线</strong>：表示元素的预估高度 (contain-intrinsic-size)</li>
+            <li><strong>绿色竖线</strong>：表示元素的实际渲染高度</li>
+        </ul>
+        <p><strong>使用提示：</strong>尝试切换 content-visibility 按钮，然后快速滚动页面，观察两种模式下的渲染行为和性能差异。特别注意滚动时的流畅度和内存使用情况。</p>
+    </div>
+    
+    <div class="info-box" style="background-color: #e8f5e9; border-left-color: #4CAF50;">
+        <h3>contain-intrinsic-size 效果演示</h3>
+        <p>下面的演示区域展示了 contain-intrinsic-size 属性的实际效果：</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div>
+                <h4 style="text-align: center;">有 contain-intrinsic-size</h4>
+                <div id="withIntrinsicSize" style="height: 300px; overflow: auto; border: 1px solid #ddd; position: relative;">
+                    <div class="demo-content" style="content-visibility: auto; contain-intrinsic-size: 0 500px; padding: 20px; background-color: #f9f9f9;">
+                        <h5>这个区域应用了 contain-intrinsic-size</h5>
+                        <p>当这个内容不在视口中时，浏览器会使用预设的高度值 (500px) 来保留空间，防止滚动条跳动。</p>
+                        <div style="height: 800px; background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                            <p style="font-size: 18px; font-weight: bold;">实际高度: 800px</p>
+                        </div>
+                        <p>滚动时，即使内容尚未渲染，滚动条长度也会保持稳定。</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 style="text-align: center;">无 contain-intrinsic-size</h4>
+                <div id="withoutIntrinsicSize" style="height: 300px; overflow: auto; border: 1px solid #ddd; position: relative;">
+                    <div class="demo-content" style="content-visibility: auto; padding: 20px; background-color: #f9f9f9;">
+                        <h5>这个区域没有应用 contain-intrinsic-size</h5>
+                        <p>当这个内容不在视口中时，浏览器不知道其高度，导致滚动条长度不准确。</p>
+                        <div style="height: 800px; background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                            <p style="font-size: 18px; font-weight: bold;">实际高度: 800px</p>
+                        </div>
+                        <p>滚动时，当内容渲染后，滚动条长度会突然变化，造成跳动。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin-top: 15px;"><strong>操作说明：</strong>尝试在上面两个区域中滚动，观察滚动条的行为差异。左侧的滚动条长度保持稳定，而右侧的滚动条长度会在内容渲染后突然变化。</p>
+    </div>
+
+    <div id="scrollInfo">滚动位置: 0px</div>
+    
+    <!-- 添加滚动指示器 -->
+    <div id="topIndicator" class="scroll-indicator" style="top: 150px;"></div>
+    <div id="middleIndicator" class="scroll-indicator" style="top: 45%;"></div>
+    <div id="bottomIndicator" class="scroll-indicator" style="bottom: 150px;"></div>
+
+    <script>
+        // 创建交叉观察器来检测元素是否在视口中
+        const createObserver = () => {
+            const options = {
+                root: null, // 使用视口作为根
+                rootMargin: '0px',
+                threshold: 0.1 // 当10%的元素可见时触发
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // 当元素进入视口
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('rendered');
+                        // 添加动画效果，显示渲染过程
+                        entry.target.style.transition = 'opacity 0.3s, transform 0.3s';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    } else if (!cvEnabled) {
+                        // 如果content-visibility关闭，保持元素可见
+                        entry.target.classList.add('rendered');
+                    }
+                });
+            }, options);
+            
+            return observer;
+        };
+        
+        // 显示滚动位置信息
+        const scrollInfo = document.getElementById('scrollInfo');
+        const topIndicator = document.getElementById('topIndicator');
+        const middleIndicator = document.getElementById('middleIndicator');
+        const bottomIndicator = document.getElementById('bottomIndicator');
+        
+        // 更新滚动指示器
+        const updateScrollIndicators = () => {
+            const scrollPosition = window.scrollY;
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollPercentage = (scrollPosition / totalHeight) * 100;
+            
+            scrollInfo.textContent = `滚动位置: ${scrollPosition.toFixed(0)}px (${scrollPercentage.toFixed(1)}%)`;
+            
+            // 更新指示器状态
+            topIndicator.classList.toggle('active', scrollPercentage < 33);
+            middleIndicator.classList.toggle('active', scrollPercentage >= 33 && scrollPercentage < 66);
+            bottomIndicator.classList.toggle('active', scrollPercentage >= 66);
+        };
+        
+        window.addEventListener('scroll', updateScrollIndicators);
+        
+        // 初始化观察器
+        const observer = createObserver();
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            observer.observe(section);
+            
+            // 初始状态设置
+            if (section.classList.contains('with-cv')) {
+                section.style.opacity = '0.8';
+                section.style.transform = 'translateY(20px)';
+            }
+        });
+
+        // 切换 content-visibility 按钮
+        const toggleCVButton = document.getElementById('toggleCV');
+        const withCVSections = document.querySelectorAll('.with-cv');
+        let cvEnabled = true;
+        let currentIntrinsicSize = 500;
+        
+        // 高度指示器相关
+        const showHeightIndicatorsCheckbox = document.getElementById('showHeightIndicators');
+        const intrinsicSizeSlider = document.getElementById('intrinsicSizeSlider');
+        const intrinsicSizeValue = document.getElementById('intrinsicSizeValue');
+        
+        // 创建高度指示器
+        function createHeightIndicators() {
+            withCVSections.forEach(section => {
+                // 移除旧的指示器
+                section.querySelectorAll('.height-indicator').forEach(indicator => indicator.remove());
+                
+                if (showHeightIndicatorsCheckbox.checked) {
+                    // 创建预估高度指示器
+                    const estimatedHeightIndicator = document.createElement('div');
+                    estimatedHeightIndicator.className = 'height-indicator estimated-height-indicator';
+                    estimatedHeightIndicator.style.height = `${currentIntrinsicSize}px`;
+                    estimatedHeightIndicator.title = `预估高度: ${currentIntrinsicSize}px`;
+                    
+                    // 创建实际高度指示器
+                    const actualHeightIndicator = document.createElement('div');
+                    actualHeightIndicator.className = 'height-indicator actual-height-indicator';
+                    const actualHeight = section.offsetHeight;
+                    actualHeightIndicator.style.height = `${actualHeight}px`;
+                    actualHeightIndicator.title = `实际高度: ${actualHeight}px`;
+                    
+                    section.appendChild(estimatedHeightIndicator);
+                    section.appendChild(actualHeightIndicator);
+                }
+            });
+        }
+        
+        // 更新contain-intrinsic-size值
+        function updateIntrinsicSize(value) {
+            currentIntrinsicSize = value;
+            intrinsicSizeValue.textContent = `${value}px`;
+            
+            if (cvEnabled) {
+                withCVSections.forEach(section => {
+                    section.style.containIntrinsicSize = `0 ${value}px`;
+                });
+            }
+            
+            // 更新高度指示器
+            createHeightIndicators();
+        }
+        
+        // 监听滑块变化
+        intrinsicSizeSlider.addEventListener('input', () => {
+            updateIntrinsicSize(parseInt(intrinsicSizeSlider.value));
+        });
+        
+        // 监听显示指示器复选框
+        showHeightIndicatorsCheckbox.addEventListener('change', createHeightIndicators);
+        
+        toggleCVButton.addEventListener('click', () => {
+            cvEnabled = !cvEnabled;
+            withCVSections.forEach(section => {
+                if (cvEnabled) {
+                    section.style.contentVisibility = 'auto';
+                    section.style.containIntrinsicSize = `0 ${currentIntrinsicSize}px`;
+                    toggleCVButton.textContent = '关闭 content-visibility';
+                    
+                    // 重置不在视口中的元素
+                    if (!section.classList.contains('rendered')) {
+                        section.style.opacity = '0.8';
+                        section.style.transform = 'translateY(20px)';
+                    }
+                } else {
+                    section.style.contentVisibility = 'visible';
+                    section.style.containIntrinsicSize = '';
+                    toggleCVButton.textContent = '开启 content-visibility';
+                    
+                    // 显示所有元素
+                    section.classList.add('rendered');
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }
+            });
+            
+            // 更新高度指示器
+            createHeightIndicators();
+        });
+
+        // 滚动按钮
+        document.getElementById('scrollToBottom').addEventListener('click', () => {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+
+        document.getElementById('scrollToTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // 初始化滚动指示器
+        updateScrollIndicators();
+        
+        // 初始化高度指示器
+        createHeightIndicators();
+        
+        // 添加性能测量
+        console.log('页面加载完成，可以在控制台查看性能信息');
+        
+        // 添加滚动时更新高度指示器
+        window.addEventListener('scroll', () => {
+            // 延迟更新高度指示器，避免频繁更新
+            if (showHeightIndicatorsCheckbox.checked) {
+                clearTimeout(window.heightIndicatorTimeout);
+                window.heightIndicatorTimeout = setTimeout(() => {
+                    withCVSections.forEach(section => {
+                        const actualHeightIndicator = section.querySelector('.actual-height-indicator');
+                        if (actualHeightIndicator) {
+                            const actualHeight = section.offsetHeight;
+                            actualHeightIndicator.style.height = `${actualHeight}px`;
+                            actualHeightIndicator.title = `实际高度: ${actualHeight}px`;
+                            
+                            // 高亮显示高度差异
+                            const estimatedHeightIndicator = section.querySelector('.estimated-height-indicator');
+                            if (estimatedHeightIndicator) {
+                                const heightDiff = Math.abs(actualHeight - currentIntrinsicSize);
+                                const diffPercentage = (heightDiff / currentIntrinsicSize) * 100;
+                                
+                                // 当差异较大时增加视觉提示
+                                if (diffPercentage > 20) {
+                                    estimatedHeightIndicator.style.boxShadow = '0 0 8px rgba(33, 150, 243, 0.8)';
+                                    actualHeightIndicator.style.boxShadow = '0 0 8px rgba(76, 175, 80, 0.8)';
+                                } else {
+                                    estimatedHeightIndicator.style.boxShadow = 'none';
+                                    actualHeightIndicator.style.boxShadow = 'none';
+                                }
+                            }
+                        }
+                    });
+                }, 100);
+            }
+        });
+        
+        // 为演示区域添加交互效果
+        const withIntrinsicSizeDemo = document.getElementById('withIntrinsicSize');
+        const withoutIntrinsicSizeDemo = document.getElementById('withoutIntrinsicSize');
+        const demoContentWithIS = withIntrinsicSizeDemo.querySelector('.demo-content');
+        const demoContentWithoutIS = withoutIntrinsicSizeDemo.querySelector('.demo-content');
+        
+        // 同步两个演示区域的滚动位置
+        withIntrinsicSizeDemo.addEventListener('scroll', () => {
+            withoutIntrinsicSizeDemo.scrollTop = withIntrinsicSizeDemo.scrollTop;
+        });
+        
+        withoutIntrinsicSizeDemo.addEventListener('scroll', () => {
+            withIntrinsicSizeDemo.scrollTop = withoutIntrinsicSizeDemo.scrollTop;
+        });
+        
+        // 添加滚动指示器到演示区域
+        function addScrollIndicators() {
+            // 为有contain-intrinsic-size的演示添加指示器
+            const withISIndicator = document.createElement('div');
+            withISIndicator.className = 'demo-scroll-indicator';
+            withISIndicator.style.cssText = 'position: absolute; right: 5px; top: 0; width: 4px; height: 30px; background-color: rgba(76, 175, 80, 0.7); border-radius: 2px; z-index: 10; transition: top 0.1s;';
+            withIntrinsicSizeDemo.appendChild(withISIndicator);
+            
+            // 为无contain-intrinsic-size的演示添加指示器
+            const withoutISIndicator = document.createElement('div');
+            withoutISIndicator.className = 'demo-scroll-indicator';
+            withoutISIndicator.style.cssText = 'position: absolute; right: 5px; top: 0; width: 4px; height: 30px; background-color: rgba(244, 67, 54, 0.7); border-radius: 2px; z-index: 10; transition: top 0.1s;';
+            withoutIntrinsicSizeDemo.appendChild(withoutISIndicator);
+            
+            // 更新指示器位置
+            function updateDemoIndicators() {
+                const withISScrollPercentage = withIntrinsicSizeDemo.scrollTop / (withIntrinsicSizeDemo.scrollHeight - withIntrinsicSizeDemo.clientHeight);
+                const withoutISScrollPercentage = withoutIntrinsicSizeDemo.scrollTop / (withoutIntrinsicSizeDemo.scrollHeight - withoutIntrinsicSizeDemo.clientHeight);
+                
+                const withISTop = withISScrollPercentage * (withIntrinsicSizeDemo.clientHeight - 30);
+                const withoutISTop = withoutISScrollPercentage * (withoutIntrinsicSizeDemo.clientHeight - 30);
+                
+                withISIndicator.style.top = `${withISTop}px`;
+                withoutISIndicator.style.top = `${withoutISTop}px`;
+            }
+            
+            withIntrinsicSizeDemo.addEventListener('scroll', updateDemoIndicators);
+            withoutIntrinsicSizeDemo.addEventListener('scroll', updateDemoIndicators);
+            
+            // 初始化指示器位置
+            updateDemoIndicators();
+        }
+        
+        // 初始化演示区域
+        addScrollIndicators();
+        
+        // 将滑块值与演示区域关联
+        intrinsicSizeSlider.addEventListener('input', () => {
+            const newValue = parseInt(intrinsicSizeSlider.value);
+            demoContentWithIS.style.containIntrinsicSize = `0 ${newValue}px`;
+            
+            // 更新演示区域的视觉效果
+            updateDemoVisualEffects();
+        });
+        
+        // 添加滚动条高亮和差异标签
+        function updateDemoVisualEffects() {
+            // 移除旧的元素
+            withIntrinsicSizeDemo.querySelectorAll('.scrollbar-highlight, .height-difference-label').forEach(el => el.remove());
+            withoutIntrinsicSizeDemo.querySelectorAll('.scrollbar-highlight, .height-difference-label').forEach(el => el.remove());
+            
+            // 获取实际内容高度和预估高度
+            const actualHeight = demoContentWithIS.querySelector('div[style*="height: 800px"]').offsetHeight + 150; // 加上padding和其他内容的高度
+            const estimatedHeight = parseInt(intrinsicSizeSlider.value);
+            const heightDiff = actualHeight - estimatedHeight;
+            const diffPercentage = Math.round((heightDiff / estimatedHeight) * 100);
+            
+            // 创建高度差异标签
+            const diffLabel = document.createElement('div');
+            diffLabel.className = 'height-difference-label';
+            diffLabel.textContent = `高度差异: ${heightDiff}px (${diffPercentage}%)`;
+            diffLabel.style.top = '10px';
+            withIntrinsicSizeDemo.appendChild(diffLabel);
+            
+            // 为有contain-intrinsic-size的演示添加滚动条高亮
+            const withISHighlight = document.createElement('div');
+            withISHighlight.className = 'scrollbar-highlight';
+            const withISScrollbarHeight = (withIntrinsicSizeDemo.clientHeight / withIntrinsicSizeDemo.scrollHeight) * withIntrinsicSizeDemo.clientHeight;
+            withISHighlight.style.height = `${withISScrollbarHeight}px`;
+            withISHighlight.style.top = '0';
+            withIntrinsicSizeDemo.appendChild(withISHighlight);
+            
+            // 为无contain-intrinsic-size的演示添加滚动条高亮
+            const withoutISHighlight = document.createElement('div');
+            withoutISHighlight.className = 'scrollbar-highlight';
+            const withoutISScrollbarHeight = (withoutIntrinsicSizeDemo.clientHeight / withoutIntrinsicSizeDemo.scrollHeight) * withoutIntrinsicSizeDemo.clientHeight;
+            withoutISHighlight.style.height = `${withoutISScrollbarHeight}px`;
+            withoutISHighlight.style.top = '0';
+            withoutIntrinsicSizeDemo.appendChild(withoutISHighlight);
+            
+            // 添加滚动条长度差异标签
+            const scrollbarDiffLabel = document.createElement('div');
+            scrollbarDiffLabel.className = 'height-difference-label';
+            const scrollbarDiff = Math.abs(withISScrollbarHeight - withoutISScrollbarHeight);
+            scrollbarDiffLabel.textContent = `滚动条长度差异: ${scrollbarDiff.toFixed(1)}px`;
+            scrollbarDiffLabel.style.bottom = '10px';
+            withIntrinsicSizeDemo.appendChild(scrollbarDiffLabel);
+        }
+        
+        // 初始化演示区域视觉效果
+        updateDemoVisualEffects();
+        
+        // 添加重置演示按钮
+        const resetDemoButton = document.createElement('button');
+        resetDemoButton.textContent = '重置演示';
+        resetDemoButton.style.cssText = 'margin-top: 10px; padding: 5px 10px;';
+        document.querySelector('.info-box[style*="background-color: #e8f5e9"]').appendChild(resetDemoButton);
+        
+        resetDemoButton.addEventListener('click', () => {
+            withIntrinsicSizeDemo.scrollTop = 0;
+            withoutIntrinsicSizeDemo.scrollTop = 0;
+        });
+    </script>
+</body>
+</html>
