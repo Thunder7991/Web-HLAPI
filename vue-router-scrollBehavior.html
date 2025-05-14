@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Router scrollBehavior 参数详解与演示</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1, h2, h3 {
+            margin: 20px 0 10px;
+            color: #2c3e50;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #42b983;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            border-left: 4px solid #42b983;
+            padding-left: 10px;
+            margin-top: 40px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            margin-top: 30px;
+        }
+        
+        p, li {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #e96900;
+        }
+        
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #476582;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .demo-header {
+            background-color: #f8f8f8;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .demo-content {
+            padding: 15px;
+            height: 500px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .nav {
+            display: flex;
+            background-color: #42b983;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            margin-right: 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav a:hover, .nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .page {
+            min-height: 800px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .section-anchor {
+            height: 50px;
+            margin-top: -50px;
+            visibility: hidden;
+            position: absolute;
+        }
+        
+        .scroll-btn {
+            background-color: #42b983;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        
+        .scroll-btn:hover {
+            background-color: #3aa876;
+        }
+        
+        .scroll-position {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px;
+        }
+        
+        .practical-demo {
+            margin-top: 30px;
+        }
+        
+        .practical-demo .content-section {
+            height: 300px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vue Router scrollBehavior 参数详解与演示</h1>
+    
+    <div class="section" id="introduction">
+        <h2>1. scrollBehavior 参数介绍</h2>
+        <p>在 Vue Router 中，<code>scrollBehavior</code> 是 <code>createRouter</code> 函数的一个重要参数，它允许我们控制页面在路由导航时的滚动行为。通过这个参数，我们可以：</p>
+        
+        <ul>
+            <li>在页面之间导航时自动滚动到页面顶部</li>
+            <li>保持页面滚动位置不变</li>
+            <li>滚动到页面上的特定元素</li>
+            <li>实现自定义的滚动行为</li>
+        </ul>
+        
+        <h3>基本语法</h3>
+        <pre><code>const router = createRouter({
+  history: createWebHistory(),
+  routes: [...],
+  scrollBehavior(to, from, savedPosition) {
+    // 返回期望滚动到的位置
+  }
+});</code></pre>
+        
+        <h3>参数说明</h3>
+        <p><code>scrollBehavior</code> 函数接收三个参数：</p>
+        <ul>
+            <li><code>to</code>：目标路由对象</li>
+            <li><code>from</code>：当前路由对象</li>
+            <li><code>savedPosition</code>：当用户使用浏览器的前进/后退按钮时，会记录之前的滚动位置</li>
+        </ul>
+        
+        <h3>返回值类型</h3>
+        <p><code>scrollBehavior</code> 函数可以返回以下几种类型的值：</p>
+        
+        <ol>
+            <li>
+                <p><strong>返回 falsy 值或空对象</strong>：不会发生滚动</p>
+                <pre><code>scrollBehavior() {
+  return false; // 或 return {};
+}</code></pre>
+            </li>
+            <li>
+                <p><strong>返回 { x, y } 对象</strong>：滚动到指定的像素位置</p>
+                <pre><code>scrollBehavior() {
+  return { top: 0, left: 0 }; // 滚动到页面顶部
+}</code></pre>
+            </li>
+            <li>
+                <p><strong>返回 { el } 对象</strong>：滚动到指定的元素</p>
+                <pre><code>scrollBehavior() {
+  return { el: '#element-id' }; // 滚动到指定元素
+}</code></pre>
+                <p>也可以传递 DOM 元素引用：</p>
+                <pre><code>scrollBehavior() {
+  return { el: document.getElementById('element-id') };
+}</code></pre>
+            </li>
+        </ol>
+        
+        <h3>滚动行为选项</h3>
+        <p>从 Vue Router 4.0 开始，可以为滚动行为添加更多选项：</p>
+        <pre><code>scrollBehavior() {
+  return {
+    top: 0,
+    behavior: 'smooth' // 平滑滚动
+  };
+}</code></pre>
+        
+        <p>或者对元素滚动添加偏移量：</p>
+        <pre><code>scrollBehavior() {
+  return {
+    el: '#element-id',
+    top: 50, // 元素顶部偏移 50px
+    behavior: 'smooth'
+  };
+}</code></pre>
+    </div>
+    
+    <div class="section" id="basic-demo">
+        <h2>2. 基础演示</h2>
+        <p>下面是一个基础演示，展示了 <code>scrollBehavior</code> 的几种常见用法：</p>
+        
+        <div id="app" class="demo-container">
+            <div class="demo-header">
+                <div>
+                    <button class="scroll-btn" @click="scrollToTop">滚动到顶部</button>
+                    <button class="scroll-btn" @click="scrollToSection">滚动到第二节</button>
+                </div>
+                <div>
+                    <span>当前路由: {{ currentRoute }}</span>
+                </div>
+            </div>
+            <div class="demo-content">
+                <router-view></router-view>
+            </div>
+        </div>
+        
+        <h3>代码解析</h3>
+        <pre><code>// 创建路由实例
+const router = VueRouter.createRouter({
+  history: VueRouter.createWebHashHistory(),
+  routes: [
+    { path: '/', component: Home },
+    { path: '/about', component: About },
+    { path: '/contact', component: Contact }
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    // 如果有保存的位置，则使用它
+    if (savedPosition) {
+      return savedPosition;
+    }
+    
+    // 如果有哈希值，则滚动到对应元素
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+        top: 20 // 给元素顶部一个偏移量
+      };
+    }
+    
+    // 否则滚动到顶部
+    return { top: 0, behavior: 'smooth' };
+  }
+});</code></pre>
+    </div>
+    
+    <div class="section" id="practical-example">
+        <h2>3. 实战案例：返回当前路由后滚动到指定位置</h2>
+        <p>在实际应用中，我们经常需要在用户返回到之前访问的页面时，恢复到用户离开时的滚动位置。或者在特定情况下，我们希望用户返回时滚动到页面的特定部分。</p>
+        
+        <div id="practical-app" class="demo-container practical-demo">
+            <div class="demo-header">
+                <div>
+                    <button class="scroll-btn" @click="navigateToPage('page1')">页面1</button>
+                    <button class="scroll-btn" @click="navigateToPage('page2')">页面2</button>
+                </div>
+                <div>
+                    <span>当前位置: {{ scrollPosition }}px</span>
+                </div>
+            </div>
+            <div class="demo-content">
+                <router-view></router-view>
+            </div>
+        </div>
+        
+        <h3>实现方法</h3>
+        <p>有几种方法可以实现返回当前路由后滚动到指定位置：</p>
+        
+        <h4>1. 使用 savedPosition</h4>
+        <pre><code>scrollBehavior(to, from, savedPosition) {
+  if (savedPosition) {
+    // 使用浏览器的前进/后退按钮时恢复位置
+    return savedPosition;
+  }
+  return { top: 0 };
+}</code></pre>
+        
+        <h4>2. 使用 meta 属性存储滚动位置</h4>
+        <pre><code>// 在路由配置中添加 meta 属性
+const routes = [
+  {
+    path: '/page',
+    component: Page,
+    meta: { saveScrollPosition: true }
+  }
+];
+
+// 在 scrollBehavior 中使用
+scrollBehavior(to, from, savedPosition) {
+  if (savedPosition) {
+    return savedPosition;
+  }
+  
+  if (from.meta.saveScrollPosition && to.path === from.path) {
+    // 存储滚动位置
+    from.meta.scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+  }
+  
+  if (to.meta.scrollPosition) {
+    // 恢复滚动位置
+    return { top: to.meta.scrollPosition };
+  }
+  
+  return { top: 0 };
+}</code></pre>
+        
+        <h4>3. 使用 sessionStorage 存储滚动位置</h4>
+        <pre><code>// 在离开页面前存储滚动位置
+beforeRouteLeave(to, from) {
+  sessionStorage.setItem(
+    `scrollPosition_${this.$route.path}`,
+    document.documentElement.scrollTop || document.body.scrollTop
+  );
+}
+
+// 在 scrollBehavior 中恢复位置
+scrollBehavior(to, from, savedPosition) {
+  if (savedPosition) {
+    return savedPosition;
+  }
+  
+  const savedScrollPosition = sessionStorage.getItem(`scrollPosition_${to.path}`);
+  if (savedScrollPosition) {
+    return { top: parseInt(savedScrollPosition) };
+  }
+  
+  return { top: 0 };
+}</code></pre>
+        
+        <h4>4. 使用 Vuex/Pinia 存储滚动位置</h4>
+        <pre><code>// 在 Vuex/Pinia store 中
+export const useScrollStore = defineStore('scroll', {
+  state: () => ({
+    positions: {}
+  }),
+  actions: {
+    savePosition(path, position) {
+      this.positions[path] = position;
+    },
+    getPosition(path) {
+      return this.positions[path] || 0;
+    }
+  }
+});
+
+// 在组件中
+onBeforeRouteLeave((to, from) => {
+  const scrollStore = useScrollStore();
+  scrollStore.savePosition(
+    from.path,
+    document.documentElement.scrollTop || document.body.scrollTop
+  );
+});
+
+// 在 scrollBehavior 中
+scrollBehavior(to, from, savedPosition) {
+  if (savedPosition) {
+    return savedPosition;
+  }
+  
+  const scrollStore = useScrollStore();
+  const savedScrollPosition = scrollStore.getPosition(to.path);
+  
+  if (savedScrollPosition) {
+    return { top: savedScrollPosition };
+  }
+  
+  return { top: 0 };
+}</code></pre>
+    </div>
+    
+    <div class="scroll-position" id="scroll-position-indicator">滚动位置: 0px</div>
+    
+    <script>
+        // 页面组件
+        const Home = {
+            template: `
+                <div class="page">
+                    <h2>首页</h2>
+                    <div class="nav">
+                        <router-link to="/">首页</router-link>
+                        <router-link to="/about">关于</router-link>
+                        <router-link to="/contact">联系</router-link>
+                    </div>
+                    <p>这是首页内容。向下滚动查看更多内容。</p>
+                    <div v-for="n in 10" :key="n" class="content-section">
+                        <h3>第 {{ n }} 节</h3>
+                        <p>这是第 {{ n }} 节的内容。</p>
+                        <div :id="'section-' + n" class="section-anchor"></div>
+                    </div>
+                </div>
+            `
+        };
+        
+        const About = {
+            template: `
+                <div class="page">
+                    <h2>关于页面</h2>
+                    <div class="nav">
+                        <router-link to="/">首页</router-link>
+                        <router-link to="/about">关于</router-link>
+                        <router-link to="/contact">联系</router-link>
+                    </div>
+                    <p>这是关于页面的内容。</p>
+                    <div v-for="n in 10" :key="n" class="content-section">
+                        <h3>关于我们 - 第 {{ n }} 节</h3>
+                        <p>这是关于我们第 {{ n }} 节的内容。</p>
+                    </div>
+                </div>
+            `
+        };
+        
+        const Contact = {
+            template: `
+                <div class="page">
+                    <h2>联系页面</h2>
+                    <div class="nav">
+                        <router-link to="/">首页</router-link>
+                        <router-link to="/about">关于</router-link>
+                        <router-link to="/contact">联系</router-link>
+                    </div>
+                    <p>这是联系页面的内容。</p>
+                    <div v-for="n in 10" :key="n" class="content-section">
+                        <h3>联系方式 - 第 {{ n }} 节</h3>
+                        <p>这是联系方式第 {{ n }} 节的内容。</p>
+                    </div>
+                </div>
+            `
+        };
+        
+        // 创建路由实例
+        const router = VueRouter.createRouter({
+            history: VueRouter.createWebHashHistory(),
+            routes: [
+                { path: '/', component: Home },
+                { path: '/about', component: About },
+                { path: '/contact', component: Contact }
+            ],
+            scrollBehavior(to, from, savedPosition) {
+                // 如果有保存的位置，则使用它
+                if (savedPosition) {
+                    console.log('使用保存的位置:', savedPosition);
+                    return savedPosition;
+                }
+                
+                // 如果有哈希值，则滚动到对应元素
+                if (to.hash) {
+                    console.log('滚动到哈希:', to.hash);
+                    return {
+                        el: to.hash,
+                        behavior: 'smooth',
+                        top: 20 // 给元素顶部一个偏移量
+                    };
+                }
+                
+                // 否则滚动到顶部
+                console.log('滚动到顶部');
+                return { top: 0, behavior: 'smooth' };
+            }
+        });
+        
+        // 创建 Vue 应用
+        const app = Vue.createApp({
+            data() {
+                return {
+                    currentRoute: '/'
+                };
+            },
+            methods: {
+                scrollToTop() {
+                    this.$router.push('/');
+                },
+                scrollToSection() {
+                    this.$router.push('/#section-2');
+                }
+            },
+            watch: {
+                '$route'(to) {
+                    this.currentRoute = to.path + (to.hash || '');
+                }
+            }
+        });
+        
+        app.use(router);
+        app.mount('#app');
+        
+        // 实战案例 - 页面组件
+        const Page1 = {
+            template: `
+                <div class="page">
+                    <h2>页面 1</h2>
+                    <p>这是页面 1 的内容。向下滚动查看更多内容。</p>
+                    <div v-for="n in 20" :key="n" class="content-section">
+                        <h3>第 {{ n }} 节</h3>
+                        <p>这是第 {{ n }} 节的内容。</p>
+                        <div :id="'p1-section-' + n" class="section-anchor"></div>
+                        <button class="scroll-btn" @click="savePosition(n)">保存此位置</button>
+                    </div>
+                </div>
+            `,
+            methods: {
+                savePosition(n) {
+                    const position = document.documentElement.scrollTop || document.body.scrollTop;
+                    sessionStorage.setItem('savedScrollPosition_page1', position);
+                    alert(`已保存位置: ${position}px (第 ${n} 节)`);
+                }
+            }
+        };
+        
+        const Page2 = {
+            template: `
+                <div class="page">
+                    <h2>页面 2</h2>
+                    <p>这是页面 2 的内容。</p>
+                    <div v-for="n in 20" :key="n" class="content-section">
+                        <h3>第 {{ n }} 节</h3>
+                        <p>这是第 {{ n }} 节的内容。</p>
+                    </div>
+                    <button class="scroll-btn" @click="goBackToSavedPosition">返回页面1并恢复位置</button>
+                </div>
+            `,
+            methods: {
+                goBackToSavedPosition() {
+                    this.$router.push('/page1');
+                }
+            }
+        };
+        
+        // 创建实战案例路由
+        const practicalRouter = VueRouter.createRouter({
+            history: VueRouter.createWebHashHistory('/practical/'),
+            routes: [
+                { path: '/page1', component: Page1 },
+                { path: '/page2', component: Page2 }
+            ],
+            scrollBehavior(to, from, savedPosition) {
+                console.log('实战案例 scrollBehavior:', { to, from, savedPosition });
+                
+                if (savedPosition) {
+                    return savedPosition;
+                }
+                
+                if (to.path === '/page1') {
+                    const savedScrollPosition = sessionStorage.getItem('savedScrollPosition_page1');
+                    if (savedScrollPosition) {
+                        console.log('恢复保存的位置:', savedScrollPosition);
+                        return { top: parseInt(savedScrollPosition), behavior: 'smooth' };
+                    }
+                }
+                
+                return { top: 0, behavior: 'smooth' };
+            }
+        });
+        
+        // 创建实战案例 Vue 应用
+        const practicalApp = Vue.createApp({
+            data() {
+                return {
+                    scrollPosition: 0
+                };
+            },
+            methods: {
+                navigateToPage(page) {
+                    this.$router.push(`/${page}`);
+                },
+                updateScrollPosition() {
+                    this.scrollPosition = Math.round(
+                        document.documentElement.scrollTop || document.body.scrollTop
+                    );
+                }
+            },
+            mounted() {
+                window.addEventListener('scroll', this.updateScrollPosition);
+                
+                // 默认导航到页面1
+                if (this.$router.currentRoute.value.path === '/') {
+                    this.$router.push('/page1');
+                }
+            },
+            beforeUnmount() {
+                window.removeEventListener('scroll', this.updateScrollPosition);
+            }
+        });
+        
+        practicalApp.use(practicalRouter);
+        practicalApp.mount('#practical-app');
+        
+        // 更新滚动位置指示器
+        function updateScrollPositionIndicator() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            document.getElementById('scroll-position-indicator').textContent = `滚动位置: ${scrollTop}px`;
+        }
+        
+        window.addEventListener('scroll', updateScrollPositionIndicator);
+        updateScrollPositionIndicator();
+    </script>
+</body>
+</html>
