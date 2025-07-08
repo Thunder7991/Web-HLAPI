@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* 基础样式 */
+        .container {
+            font-family: Arial, sans-serif;
+            border: 2px solid #3498db;
+            padding: 20px;
+            margin: 20px;
+        }
+        .container > div, .container > p, .container > span {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+        }
+
+        /* 1. :first-child 首个子元素 */
+        .container > :first-child {
+            background-color: #ff9aa2; /* 粉色 */
+        }
+
+        /* 2. :last-child 最后一个子元素 */
+        .container > :last-child {
+            background-color: #ffb7b2; /* 浅红色 */
+        }
+
+        /* 3. :nth-child(3) 第三个子元素 */
+        .container > :nth-child(3) {
+            background-color: #ffdfba; /* 橙色 */
+        }
+
+        /* 4. :nth-last-child(2) 倒数第二个子元素 */
+        .container > :nth-last-child(2) {
+            background-color: #ffffba; /* 黄色 */
+        }
+
+        /* 5. p:first-of-type 第一个<p>元素 */
+        .container > p:first-of-type {
+            background-color: #baffc9; /* 绿色 */
+        }
+
+        /* 6. span:last-of-type 最后一个<span>元素 */
+        .container > span:last-of-type {
+            background-color: #bae1ff; /* 蓝色 */
+        }
+
+        /* 7. div:nth-of-type(2) 第二个<div>元素 */
+        .container > div:nth-of-type(2) {
+            background-color: red; /* 紫色 */
+        }
+
+        /* 8. p:nth-last-of-type(1) 倒数第一个<p>元素 */
+        .container > p:nth-last-of-type(1) {
+            background-color: #ffccf9; /* 粉色 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>1. :first-child (首个子元素)</div>
+        <p>2. 普通段落</p>
+        <span>3. 普通span (:nth-child(3))</span>
+        <div>4. div元素 (:nth-of-type(2))</div>
+        <p>5. 特殊段落 (:first-of-type)</p>
+        <span>6. 特殊span (:last-of-type)</span>
+        <p>7. 最后一个段落 (:nth-last-of-type(1))</p>
+        <div>8. :last-child (最后一个子元素)</div>
+    </div>
+</body>
+</html>
