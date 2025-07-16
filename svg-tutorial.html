@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG完整教程 - 从基础到高级</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 50px;
+            border-left: 5px solid #3498db;
+            padding-left: 20px;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 35px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #8e44ad;
+            margin-top: 25px;
+            font-size: 1.2em;
+        }
+        
+        .theory {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .demo-section {
+            margin: 40px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .demo-title {
+            background: linear-gradient(135deg, #495057, #6c757d);
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .demo-content {
+            padding: 30px;
+            background: #fff;
+        }
+        
+        .svg-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .attribute-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .attribute-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .attribute-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .attribute-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .attribute-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        code {
+            background: #495057;
+            color: #f8f9fa;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .tip {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 4px solid #28a745;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .case-difficulty {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .difficulty-1 { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .difficulty-2 { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .difficulty-3 { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .difficulty-4 { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .difficulty-5 { background: linear-gradient(135deg, #34495e, #2c3e50); }
+        
+        .interactive-demo {
+            background: #fff;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .controls input, .controls select {
+            margin: 5px 10px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        
+        .controls label {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .toc {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .toc li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #1976d2;
+        }
+        
+        .toc a {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SVG完整教程</h1>
+        <p class="subtitle">从基础概念到高级应用 - 可缩放矢量图形详解</p>
+        
+        <div class="toc">
+            <h3>📚 目录导航</h3>
+            <ul>
+                <li><a href="#basic-concept">SVG基础概念</a></li>
+                <li><a href="#attributes">SVG属性详解</a></li>
+                <li><a href="#basic-shapes">基本图形元素</a></li>
+                <li><a href="#advanced-features">高级特性</a></li>
+                <li><a href="#cases">实战案例（5个难度递增）</a></li>
+            </ul>
+        </div>
+        
+        <h2 id="basic-concept">一、SVG基础概念</h2>
+        <div class="theory">
+            <h3>什么是SVG？</h3>
+            <p><strong>SVG（Scalable Vector Graphics）</strong>是一种基于XML的矢量图形格式，用于描述二维图形。与位图不同，SVG图形可以无限缩放而不失真，文件体积小，支持交互和动画。</p>
+            
+            <h4>SVG的主要优势：</h4>
+            <ul>
+                <li><span class="highlight">可缩放性</span>：无论放大多少倍都不会失真</li>
+                <li><span class="highlight">小文件体积</span>：相比位图文件更小</li>
+                <li><span class="highlight">可编辑性</span>：可以用代码直接编辑</li>
+                <li><span class="highlight">SEO友好</span>：搜索引擎可以索引SVG中的文本</li>
+                <li><span class="highlight">交互性</span>：支持CSS样式和JavaScript交互</li>
+                <li><span class="highlight">动画支持</span>：内置动画功能</li>
+            </ul>
+            
+            <h4>SVG的基本结构：</h4>
+            <div class="code-block">
+&lt;svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"&gt;
+    &lt;!-- SVG内容 --&gt;
+&lt;/svg&gt;
+            </div>
+        </div>
+        
+        <h2 id="attributes">二、SVG属性详解</h2>
+        
+        <h3>2.1 SVG根元素属性</h3>
+        <table class="attribute-table">
+            <thead>
+                <tr>
+                    <th>属性</th>
+                    <th>描述</th>
+                    <th>示例值</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>width</code></td>
+                    <td>SVG画布宽度</td>
+                    <td>"200", "100%", "50vw"</td>
+                    <td>可以是像素值、百分比或视口单位</td>
+                </tr>
+                <tr>
+                    <td><code>height</code></td>
+                    <td>SVG画布高度</td>
+                    <td>"200", "100%", "50vh"</td>
+                    <td>可以是像素值、百分比或视口单位</td>
+                </tr>
+                <tr>
+                    <td><code>viewBox</code></td>
+                    <td>定义用户坐标系统</td>
+                    <td>"0 0 100 100"</td>
+                    <td>格式：min-x min-y width height</td>
+                </tr>
+                <tr>
+                    <td><code>preserveAspectRatio</code></td>
+                    <td>控制缩放行为</td>
+                    <td>"xMidYMid meet"</td>
+                    <td>控制如何在viewBox中对齐和缩放</td>
+                </tr>
+                <tr>
+                    <td><code>xmlns</code></td>
+                    <td>XML命名空间</td>
+                    <td>"http://www.w3.org/2000/svg"</td>
+                    <td>定义SVG命名空间</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>2.2 通用图形属性</h3>
+        <table class="attribute-table">
+            <thead>
+                <tr>
+                    <th>属性</th>
+                    <th>描述</th>
+                    <th>示例值</th>
+                    <th>适用元素</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>fill</code></td>
+                    <td>填充颜色</td>
+                    <td>"red", "#ff0000", "rgb(255,0,0)"</td>
+                    <td>所有图形元素</td>
+                </tr>
+                <tr>
+                    <td><code>stroke</code></td>
+                    <td>描边颜色</td>
+                    <td>"blue", "#0000ff", "none"</td>
+                    <td>所有图形元素</td>
+                </tr>
+                <tr>
+                    <td><code>stroke-width</code></td>
+                    <td>描边宽度</td>
+                    <td>"1", "2.5", "0.5"</td>
+                    <td>所有图形元素</td>
+                </tr>
+                <tr>
+                    <td><code>opacity</code></td>
+                    <td>透明度</td>
+                    <td>"0.5", "0.8", "1"</td>
+                    <td>所有元素</td>
+                </tr>
+                <tr>
+                    <td><code>transform</code></td>
+                    <td>变换</td>
+                    <td>"rotate(45)", "scale(2)", "translate(10,20)"</td>
+                    <td>所有元素</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2 id="basic-shapes">三、基本图形元素</h2>
+        
+        <h3>3.1 矩形 (rect)</h3>
+        <div class="demo-section">
+            <div class="demo-title">矩形元素属性</div>
+            <div class="demo-content">
+                <table class="attribute-table">
+                    <thead>
+                        <tr><th>属性</th><th>描述</th><th>示例</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>x, y</code></td><td>左上角坐标</td><td>x="10" y="20"</td></tr>
+                        <tr><td><code>width, height</code></td><td>宽度和高度</td><td>width="100" height="50"</td></tr>
+                        <tr><td><code>rx, ry</code></td><td>圆角半径</td><td>rx="5" ry="10"</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="svg-container">
+                    <svg width="300" height="150" style="border: 1px solid #ccc;">
+                        <rect x="10" y="10" width="80" height="40" fill="#3498db" />
+                        <rect x="100" y="10" width="80" height="40" fill="#e74c3c" rx="10" ry="10" />
+                        <rect x="190" y="10" width="80" height="40" fill="#2ecc71" stroke="#27ae60" stroke-width="3" fill="none" />
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;rect x="10" y="10" width="80" height="40" fill="#3498db" /&gt;
+&lt;rect x="100" y="10" width="80" height="40" fill="#e74c3c" rx="10" ry="10" /&gt;
+&lt;rect x="190" y="10" width="80" height="40" fill="none" stroke="#2ecc71" stroke-width="3" /&gt;
+                </div>
+            </div>
+        </div>
+        
+        <h3>案例5：交互式SVG应用</h3>
+        <div class="demo-section">
+            <div class="demo-title">难度等级</div>
+            <div class="demo-content">
+                <div class="case-difficulty difficulty-5">⭐⭐⭐⭐⭐ 专家级 - 综合应用</div>
+                
+                <p><strong>目标：</strong>创建一个交互式的SVG绘图板，集成多种功能</p>
+                
+                <div class="interactive-demo">
+                    <div class="controls">
+                        <label>工具: 
+                            <select id="drawTool" onchange="changeTool()">
+                                <option value="pen">画笔</option>
+                                <option value="rect">矩形</option>
+                                <option value="circle">圆形</option>
+                                <option value="line">直线</option>
+                            </select>
+                        </label>
+                        <label>颜色: <input type="color" id="drawColor" value="#3498db" onchange="changeColor()"></label>
+                        <label>粗细: <input type="range" id="strokeWidth" min="1" max="10" value="3" onchange="changeWidth()"></label>
+                        <button onclick="clearCanvas()">清空画布</button>
+                        <button onclick="saveAsSVG()">保存SVG</button>
+                    </div>
+                    
+                    <div class="svg-container">
+                        <svg id="drawingCanvas" width="600" height="400" viewBox="0 0 600 400" 
+                             style="border: 2px solid #3498db; background: #fff; cursor: crosshair;">
+                            <defs>
+                                <filter id="dropShadow">
+                                    <feDropShadow dx="1" dy="1" stdDeviation="1" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <rect width="100%" height="100%" fill="#fff"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+&lt;svg id="drawingCanvas" width="600" height="400"&gt;
+    &lt;!-- 动态生成的绘图内容 --&gt;
+&lt;/svg&gt;
+
+&lt;script&gt;
+let isDrawing = false;
+let currentTool = 'pen';
+let currentColor = '#3498db';
+let currentWidth = 3;
+let startX, startY;
+let currentPath = '';
+
+// 鼠标事件处理
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    
+    if (currentTool === 'pen') {
+        currentPath = `M ${startX} ${startY}`;
+    }
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    if (currentTool === 'pen') {
+        currentPath += ` L ${x} ${y}`;
+        updatePreview();
+    }
+}
+&lt;/script&gt;
+                </div>
+                
+                <script>
+                let isDrawing = false;
+                let currentTool = 'pen';
+                let currentColor = '#3498db';
+                let currentWidth = 3;
+                let startX, startY;
+                let currentPath = '';
+                let tempElement = null;
+                
+                const canvas = document.getElementById('drawingCanvas');
+                
+                function changeTool() {
+                    currentTool = document.getElementById('drawTool').value;
+                }
+                
+                function changeColor() {
+                    currentColor = document.getElementById('drawColor').value;
+                }
+                
+                function changeWidth() {
+                    currentWidth = document.getElementById('strokeWidth').value;
+                }
+                
+                function clearCanvas() {
+                    const elements = canvas.querySelectorAll('*:not(defs):not(defs *):not(rect[fill="#fff"])');
+                    elements.forEach(el => el.remove());
+                }
+                
+                function saveAsSVG() {
+                    const svgData = new XMLSerializer().serializeToString(canvas);
+                    const blob = new Blob([svgData], {type: 'image/svg+xml'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'drawing.svg';
+                    a.click();
+                }
+                
+                canvas.addEventListener('mousedown', function(e) {
+                    isDrawing = true;
+                    const rect = canvas.getBoundingClientRect();
+                    startX = (e.clientX - rect.left) * (600 / rect.width);
+                    startY = (e.clientY - rect.top) * (400 / rect.height);
+                    
+                    if (currentTool === 'pen') {
+                        currentPath = `M ${startX} ${startY}`;
+                        tempElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        tempElement.setAttribute('d', currentPath);
+                        tempElement.setAttribute('stroke', currentColor);
+                        tempElement.setAttribute('stroke-width', currentWidth);
+                        tempElement.setAttribute('fill', 'none');
+                        tempElement.setAttribute('filter', 'url(#dropShadow)');
+                        canvas.appendChild(tempElement);
+                    }
+                });
+                
+                canvas.addEventListener('mousemove', function(e) {
+                    if (!isDrawing) return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) * (600 / rect.width);
+                    const y = (e.clientY - rect.top) * (400 / rect.height);
+                    
+                    if (tempElement) tempElement.remove();
+                    
+                    if (currentTool === 'pen') {
+                        currentPath += ` L ${x} ${y}`;
+                        tempElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        tempElement.setAttribute('d', currentPath);
+                        tempElement.setAttribute('stroke', currentColor);
+                        tempElement.setAttribute('stroke-width', currentWidth);
+                        tempElement.setAttribute('fill', 'none');
+                        tempElement.setAttribute('filter', 'url(#dropShadow)');
+                        canvas.appendChild(tempElement);
+                    } else if (currentTool === 'rect') {
+                        tempElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        tempElement.setAttribute('x', Math.min(startX, x));
+                        tempElement.setAttribute('y', Math.min(startY, y));
+                        tempElement.setAttribute('width', Math.abs(x - startX));
+                        tempElement.setAttribute('height', Math.abs(y - startY));
+                        tempElement.setAttribute('stroke', currentColor);
+                        tempElement.setAttribute('stroke-width', currentWidth);
+                        tempElement.setAttribute('fill', 'none');
+                        tempElement.setAttribute('filter', 'url(#dropShadow)');
+                        canvas.appendChild(tempElement);
+                    } else if (currentTool === 'circle') {
+                        const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                        tempElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        tempElement.setAttribute('cx', startX);
+                        tempElement.setAttribute('cy', startY);
+                        tempElement.setAttribute('r', radius);
+                        tempElement.setAttribute('stroke', currentColor);
+                        tempElement.setAttribute('stroke-width', currentWidth);
+                        tempElement.setAttribute('fill', 'none');
+                        tempElement.setAttribute('filter', 'url(#dropShadow)');
+                        canvas.appendChild(tempElement);
+                    } else if (currentTool === 'line') {
+                        tempElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        tempElement.setAttribute('x1', startX);
+                        tempElement.setAttribute('y1', startY);
+                        tempElement.setAttribute('x2', x);
+                        tempElement.setAttribute('y2', y);
+                        tempElement.setAttribute('stroke', currentColor);
+                        tempElement.setAttribute('stroke-width', currentWidth);
+                        tempElement.setAttribute('filter', 'url(#dropShadow)');
+                        canvas.appendChild(tempElement);
+                    }
+                });
+                
+                canvas.addEventListener('mouseup', function() {
+                    isDrawing = false;
+                    tempElement = null;
+                });
+                
+                canvas.addEventListener('mouseleave', function() {
+                    isDrawing = false;
+                    tempElement = null;
+                });
+                </script>
+                
+                <div class="tip">
+                    <strong>学习要点：</strong>
+                    <ul>
+                        <li>SVG与JavaScript的深度集成</li>
+                        <li>事件处理和用户交互</li>
+                        <li>动态创建和操作SVG元素</li>
+                        <li>坐标系统的精确控制</li>
+                        <li>SVG数据的序列化和保存</li>
+                        <li>实际应用中的性能优化</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <h2>六、SVG最佳实践与总结</h2>
+        <div class="theory">
+            <h3>🎯 SVG使用最佳实践</h3>
+            <div class="warning">
+                <h4>性能优化建议：</h4>
+                <ul>
+                    <li><strong>简化路径：</strong>避免过于复杂的路径，使用工具优化路径数据</li>
+                    <li><strong>合理使用滤镜：</strong>滤镜效果消耗性能，谨慎使用</li>
+                    <li><strong>控制动画数量：</strong>同时运行的动画不宜过多</li>
+                    <li><strong>使用CSS动画：</strong>优先使用CSS动画而非SVG动画</li>
+                    <li><strong>适当的viewBox：</strong>合理设置viewBox以获得最佳显示效果</li>
+                </ul>
+            </div>
+            
+            <h4>兼容性考虑：</h4>
+            <ul>
+                <li>现代浏览器对SVG支持良好，IE9+开始支持</li>
+                <li>移动端浏览器支持度高</li>
+                <li>某些高级特性可能需要polyfill</li>
+            </ul>
+            
+            <h4>应用场景：</h4>
+            <ul>
+                <li><span class="highlight">图标系统：</span>可缩放的图标库</li>
+                <li><span class="highlight">数据可视化：</span>图表、图形展示</li>
+                <li><span class="highlight">插画设计：</span>矢量插画和装饰</li>
+                <li><span class="highlight">动画效果：</span>轻量级动画实现</li>
+                <li><span class="highlight">交互应用：</span>可交互的图形界面</li>
+            </ul>
+        </div>
+        
+        <div class="theory">
+            <h3>📚 学习路径总结</h3>
+            <ol>
+                <li><strong>基础阶段：</strong>掌握基本图形元素和属性</li>
+                <li><strong>进阶阶段：</strong>学习路径、渐变、滤镜等高级特性</li>
+                <li><strong>应用阶段：</strong>结合JavaScript实现交互和动画</li>
+                <li><strong>优化阶段：</strong>性能优化和最佳实践</li>
+                <li><strong>专业阶段：</strong>复杂应用开发和工具集成</li>
+            </ol>
+            
+            <div class="tip">
+                <strong>💡 继续学习建议：</strong>
+                <ul>
+                    <li>练习更多实际项目</li>
+                    <li>学习SVG工具和库（如D3.js、Snap.svg）</li>
+                    <li>深入了解SVG规范</li>
+                    <li>关注SVG在现代前端框架中的应用</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px; padding: 30px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; color: white;">
+            <h2 style="margin: 0; color: white;">🎉 恭喜完成SVG完整教程！</h2>
+            <p style="margin: 10px 0; font-size: 1.1em;">从基础概念到高级应用，你已经掌握了SVG的核心技能</p>
+            <p style="margin: 0; opacity: 0.9;">继续实践，创造更多精彩的SVG作品吧！</p>
+        </div>
+    </div>
+</body>
+</html>
+        
+        <h3>3.2 圆形 (circle) 和椭圆 (ellipse)</h3>
+        <div class="demo-section">
+            <div class="demo-title">圆形和椭圆元素</div>
+            <div class="demo-content">
+                <table class="attribute-table">
+                    <thead>
+                        <tr><th>元素</th><th>属性</th><th>描述</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td rowspan="3">circle</td><td><code>cx, cy</code></td><td>圆心坐标</td></tr>
+                        <tr><td><code>r</code></td><td>半径</td></tr>
+                        <tr><td colspan="2">示例：&lt;circle cx="50" cy="50" r="30" /&gt;</td></tr>
+                        <tr><td rowspan="4">ellipse</td><td><code>cx, cy</code></td><td>椭圆中心坐标</td></tr>
+                        <tr><td><code>rx</code></td><td>水平半径</td></tr>
+                        <tr><td><code>ry</code></td><td>垂直半径</td></tr>
+                        <tr><td colspan="2">示例：&lt;ellipse cx="50" cy="50" rx="40" ry="20" /&gt;</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="svg-container">
+                    <svg width="300" height="150" style="border: 1px solid #ccc;">
+                        <circle cx="60" cy="75" r="40" fill="#9b59b6" opacity="0.7" />
+                        <ellipse cx="180" cy="75" rx="50" ry="30" fill="#f39c12" stroke="#e67e22" stroke-width="2" />
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;circle cx="60" cy="75" r="40" fill="#9b59b6" opacity="0.7" /&gt;
+&lt;ellipse cx="180" cy="75" rx="50" ry="30" fill="#f39c12" stroke="#e67e22" stroke-width="2" /&gt;
+                </div>
+            </div>
+        </div>
+        
+        <h3>3.3 线条 (line) 和折线 (polyline)</h3>
+        <div class="demo-section">
+            <div class="demo-title">线条元素</div>
+            <div class="demo-content">
+                <div class="svg-container">
+                    <svg width="300" height="150" style="border: 1px solid #ccc;">
+                        <line x1="10" y1="10" x2="100" y2="100" stroke="#e74c3c" stroke-width="3" />
+                        <polyline points="120,10 150,50 180,30 210,70 240,20" 
+                                 fill="none" stroke="#3498db" stroke-width="2" />
+                        <polyline points="120,80 140,120 160,90 180,130 200,100 220,140" 
+                                 fill="#2ecc71" stroke="#27ae60" stroke-width="2" opacity="0.7" />
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;line x1="10" y1="10" x2="100" y2="100" stroke="#e74c3c" stroke-width="3" /&gt;
+&lt;polyline points="120,10 150,50 180,30 210,70 240,20" 
+         fill="none" stroke="#3498db" stroke-width="2" /&gt;
+&lt;polyline points="120,80 140,120 160,90 180,130 200,100 220,140" 
+         fill="#2ecc71" stroke="#27ae60" stroke-width="2" /&gt;
+                </div>
+            </div>
+        </div>
+        
+        <h3>3.4 路径 (path) - 最强大的元素</h3>
+        <div class="demo-section">
+            <div class="demo-title">路径命令详解</div>
+            <div class="demo-content">
+                <table class="attribute-table">
+                    <thead>
+                        <tr><th>命令</th><th>名称</th><th>参数</th><th>描述</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>M</code></td><td>moveTo</td><td>x y</td><td>移动到指定点</td></tr>
+                        <tr><td><code>L</code></td><td>lineTo</td><td>x y</td><td>画直线到指定点</td></tr>
+                        <tr><td><code>H</code></td><td>horizontal</td><td>x</td><td>水平线到x坐标</td></tr>
+                        <tr><td><code>V</code></td><td>vertical</td><td>y</td><td>垂直线到y坐标</td></tr>
+                        <tr><td><code>C</code></td><td>curveTo</td><td>x1 y1 x2 y2 x y</td><td>三次贝塞尔曲线</td></tr>
+                        <tr><td><code>Q</code></td><td>quadratic</td><td>x1 y1 x y</td><td>二次贝塞尔曲线</td></tr>
+                        <tr><td><code>A</code></td><td>arc</td><td>rx ry rotation large-arc sweep x y</td><td>椭圆弧</td></tr>
+                        <tr><td><code>Z</code></td><td>closePath</td><td>无</td><td>闭合路径</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="tip">
+                    <strong>💡 提示：</strong>大写字母表示绝对坐标，小写字母表示相对坐标。
+                </div>
+                
+                <h4>路径命令详细示例</h4>
+                
+                <div class="warning">
+                    <h5>🔤 M/m - MoveTo（移动到）</h5>
+                    <p><strong>作用：</strong>将画笔移动到指定位置，不绘制任何线条</p>
+                    <div class="svg-container">
+                        <svg width="300" height="100" style="border: 1px solid #ccc;">
+                            <!-- 显示移动轨迹的虚线 -->
+                            <line x1="20" y1="50" x2="80" y2="30" stroke="#ddd" stroke-width="1" stroke-dasharray="2,2"/>
+                            <line x1="80" y1="30" x2="140" y2="70" stroke="#ddd" stroke-width="1" stroke-dasharray="2,2"/>
+                            <!-- 实际绘制的路径 -->
+                            <path d="M 20 50 L 50 50 M 80 30 L 110 30 M 140 70 L 170 70" 
+                                  stroke="#e74c3c" stroke-width="3" fill="none"/>
+                            <!-- 标记点 -->
+                            <circle cx="20" cy="50" r="3" fill="#3498db"/>
+                            <circle cx="80" cy="30" r="3" fill="#3498db"/>
+                            <circle cx="140" cy="70" r="3" fill="#3498db"/>
+                            <text x="25" y="45" font-size="12" fill="#666">M 20,50</text>
+                            <text x="85" y="25" font-size="12" fill="#666">M 80,30</text>
+                            <text x="145" y="65" font-size="12" fill="#666">M 140,70</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- 绝对坐标：M x y --&gt;
+&lt;path d="M 20 50 L 50 50 M 80 30 L 110 30" stroke="red" fill="none"/&gt;
+&lt;!-- 相对坐标：m dx dy（相对于当前位置的偏移） --&gt;
+&lt;path d="M 20 50 l 30 0 m 30 -20 l 30 0" stroke="red" fill="none"/&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>📏 L/l - LineTo（直线到）</h5>
+                    <p><strong>作用：</strong>从当前位置画直线到指定位置</p>
+                    <div class="svg-container">
+                        <svg width="300" height="120" style="border: 1px solid #ccc;">
+                            <!-- 绝对坐标示例 -->
+                            <path d="M 20 20 L 80 20 L 80 60 L 20 60 L 20 20" 
+                                  stroke="#2ecc71" stroke-width="3" fill="rgba(46,204,113,0.2)"/>
+                            <!-- 相对坐标示例 -->
+                            <path d="M 120 20 l 60 0 l 0 40 l -60 0 l 0 -40" 
+                                  stroke="#e67e22" stroke-width="3" fill="rgba(230,126,34,0.2)"/>
+                            <!-- 标记点 -->
+                            <circle cx="20" cy="20" r="2" fill="#2ecc71"/>
+                            <circle cx="80" cy="20" r="2" fill="#2ecc71"/>
+                            <circle cx="80" cy="60" r="2" fill="#2ecc71"/>
+                            <circle cx="20" cy="60" r="2" fill="#2ecc71"/>
+                            <text x="25" y="95" font-size="12" fill="#666">绝对坐标：L x y</text>
+                            <text x="125" y="95" font-size="12" fill="#666">相对坐标：l dx dy</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- 绝对坐标：画一个矩形 --&gt;
+&lt;path d="M 20 20 L 80 20 L 80 60 L 20 60 L 20 20" stroke="green" fill="none"/&gt;
+&lt;!-- 相对坐标：同样的矩形 --&gt;
+&lt;path d="M 20 20 l 60 0 l 0 40 l -60 0 l 0 -40" stroke="orange" fill="none"/&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>↔️ H/h 和 ↕️ V/v - 水平线和垂直线</h5>
+                    <p><strong>作用：</strong>H绘制水平线，V绘制垂直线，简化直线绘制</p>
+                    <div class="svg-container">
+                        <svg width="300" height="120" style="border: 1px solid #ccc;">
+                            <!-- 水平线示例 -->
+                            <path d="M 20 30 H 100" stroke="#9b59b6" stroke-width="4"/>
+                            <path d="M 20 50 h 80" stroke="#8e44ad" stroke-width="4"/>
+                            <!-- 垂直线示例 -->
+                            <path d="M 130 20 V 80" stroke="#3498db" stroke-width="4"/>
+                            <path d="M 150 20 v 60" stroke="#2980b9" stroke-width="4"/>
+                            <!-- 组合示例：阶梯 -->
+                            <path d="M 180 80 H 200 V 60 H 220 V 40 H 240 V 20" 
+                                  stroke="#e74c3c" stroke-width="3" fill="none"/>
+                            <!-- 标签 -->
+                            <text x="25" y="15" font-size="12" fill="#666">H 100 (绝对)</text>
+                            <text x="25" y="70" font-size="12" fill="#666">h 80 (相对)</text>
+                            <text x="135" y="15" font-size="12" fill="#666">V 80</text>
+                            <text x="155" y="15" font-size="12" fill="#666">v 60</text>
+                            <text x="185" y="100" font-size="12" fill="#666">阶梯组合</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- 水平线：H x（绝对坐标到x） / h dx（相对移动dx） --&gt;
+&lt;path d="M 20 30 H 100" stroke="purple"/&gt;  &lt;!-- 从(20,30)到(100,30) --&gt;
+&lt;path d="M 20 50 h 80" stroke="purple"/&gt;   &lt;!-- 从(20,50)向右移动80到(100,50) --&gt;
+
+&lt;!-- 垂直线：V y（绝对坐标到y） / v dy（相对移动dy） --&gt;
+&lt;path d="M 130 20 V 80" stroke="blue"/&gt;    &lt;!-- 从(130,20)到(130,80) --&gt;
+&lt;path d="M 150 20 v 60" stroke="blue"/&gt;    &lt;!-- 从(150,20)向下移动60到(150,80) --&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>🌊 C/c - 三次贝塞尔曲线</h5>
+                    <p><strong>作用：</strong>绘制平滑的曲线，有两个控制点</p>
+                    <div class="svg-container">
+                        <svg width="400" height="150" style="border: 1px solid #ccc;">
+                            <!-- 贝塞尔曲线 -->
+                            <path d="M 50 100 C 50 50, 150 50, 150 100" 
+                                  stroke="#e74c3c" stroke-width="3" fill="none"/>
+                            <!-- 控制线（辅助线） -->
+                            <line x1="50" y1="100" x2="50" y2="50" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>
+                            <line x1="150" y1="100" x2="150" y2="50" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>
+                            <!-- 标记点 -->
+                            <circle cx="50" cy="100" r="4" fill="#2ecc71"/>  <!-- 起点 -->
+                            <circle cx="150" cy="100" r="4" fill="#e74c3c"/> <!-- 终点 -->
+                            <circle cx="50" cy="50" r="3" fill="#f39c12"/>   <!-- 控制点1 -->
+                            <circle cx="150" cy="50" r="3" fill="#f39c12"/> <!-- 控制点2 -->
+                            <!-- 标签 -->
+                            <text x="30" y="110" font-size="12" fill="#2ecc71">起点</text>
+                            <text x="130" y="110" font-size="12" fill="#e74c3c">终点</text>
+                            <text x="30" y="45" font-size="12" fill="#f39c12">控制点1</text>
+                            <text x="130" y="45" font-size="12" fill="#f39c12">控制点2</text>
+                            
+                            <!-- 第二个例子：S形曲线 -->
+                            <path d="M 220 50 C 270 50, 270 100, 320 100 C 370 100, 370 50, 420 50" 
+                                  stroke="#9b59b6" stroke-width="3" fill="none"/>
+                            <text x="250" y="130" font-size="12" fill="#666">S形连续曲线</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- C x1 y1 x2 y2 x y：三次贝塞尔曲线 --&gt;
+&lt;!-- x1,y1: 第一个控制点  x2,y2: 第二个控制点  x,y: 终点 --&gt;
+&lt;path d="M 50 100 C 50 50, 150 50, 150 100" stroke="red" fill="none"/&gt;
+
+&lt;!-- 连续的平滑曲线 --&gt;
+&lt;path d="M 220 50 C 270 50, 270 100, 320 100 C 370 100, 370 50, 420 50" 
+      stroke="purple" fill="none"/&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>🎯 Q/q - 二次贝塞尔曲线</h5>
+                    <p><strong>作用：</strong>绘制简单的曲线，只有一个控制点</p>
+                    <div class="svg-container">
+                        <svg width="350" height="120" style="border: 1px solid #ccc;">
+                            <!-- 二次贝塞尔曲线 -->
+                            <path d="M 50 80 Q 100 20, 150 80" 
+                                  stroke="#16a085" stroke-width="3" fill="none"/>
+                            <!-- 控制线 -->
+                            <line x1="50" y1="80" x2="100" y2="20" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>
+                            <line x1="150" y1="80" x2="100" y2="20" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>
+                            <!-- 标记点 -->
+                            <circle cx="50" cy="80" r="4" fill="#2ecc71"/>  <!-- 起点 -->
+                            <circle cx="150" cy="80" r="4" fill="#e74c3c"/> <!-- 终点 -->
+                            <circle cx="100" cy="20" r="3" fill="#f39c12"/> <!-- 控制点 -->
+                            <!-- 标签 -->
+                            <text x="30" y="95" font-size="12" fill="#2ecc71">起点</text>
+                            <text x="130" y="95" font-size="12" fill="#e74c3c">终点</text>
+                            <text x="80" y="15" font-size="12" fill="#f39c12">控制点</text>
+                            
+                            <!-- 对比：抛物线 -->
+                            <path d="M 200 80 Q 250 40, 300 80" 
+                                  stroke="#e67e22" stroke-width="3" fill="rgba(230,126,34,0.2)"/>
+                            <text x="220" y="105" font-size="12" fill="#666">抛物线形状</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- Q x1 y1 x y：二次贝塞尔曲线 --&gt;
+&lt;!-- x1,y1: 控制点  x,y: 终点 --&gt;
+&lt;path d="M 50 80 Q 100 20, 150 80" stroke="teal" fill="none"/&gt;
+
+&lt;!-- 创建抛物线效果 --&gt;
+&lt;path d="M 200 80 Q 250 40, 300 80" stroke="orange" fill="rgba(230,126,34,0.2)"/&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>🌙 A/a - 椭圆弧</h5>
+                    <p><strong>作用：</strong>绘制椭圆的一部分，参数最复杂但功能强大</p>
+                    <div class="svg-container">
+                        <svg width="400" height="150" style="border: 1px solid #ccc;">
+                            <!-- 椭圆弧示例 -->
+                            <path d="M 50 100 A 50 30 0 0 1 150 100" 
+                                  stroke="#8e44ad" stroke-width="3" fill="rgba(142,68,173,0.2)"/>
+                            <path d="M 50 100 A 50 30 0 1 1 150 100" 
+                                  stroke="#3498db" stroke-width="3" fill="none"/>
+                            <!-- 标记点 -->
+                            <circle cx="50" cy="100" r="3" fill="#2ecc71"/>
+                            <circle cx="150" cy="100" r="3" fill="#e74c3c"/>
+                            <text x="30" y="115" font-size="12" fill="#666">起点</text>
+                            <text x="130" y="115" font-size="12" fill="#666">终点</text>
+                            <text x="70" y="130" font-size="12" fill="#8e44ad">小弧(0)</text>
+                            <text x="70" y="50" font-size="12" fill="#3498db">大弧(1)</text>
+                            
+                            <!-- 圆形示例 -->
+                            <path d="M 250 75 A 25 25 0 1 1 250 74" 
+                                  stroke="#e74c3c" stroke-width="3" fill="rgba(231,76,60,0.2)"/>
+                            <text x="230" y="130" font-size="12" fill="#666">近似圆形</text>
+                            
+                            <!-- 扇形示例 -->
+                            <path d="M 350 100 L 350 75 A 25 25 0 0 1 375 100 Z" 
+                                  stroke="#f39c12" stroke-width="2" fill="rgba(243,156,18,0.3)"/>
+                            <text x="330" y="130" font-size="12" fill="#666">扇形</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- A rx ry rotation large-arc-flag sweep-flag x y --&gt;
+&lt;!-- rx,ry: 椭圆的x和y半径 --&gt;
+&lt;!-- rotation: 椭圆旋转角度 --&gt;
+&lt;!-- large-arc-flag: 0=小弧, 1=大弧 --&gt;
+&lt;!-- sweep-flag: 0=逆时针, 1=顺时针 --&gt;
+&lt;!-- x,y: 终点坐标 --&gt;
+
+&lt;!-- 小弧 --&gt;
+&lt;path d="M 50 100 A 50 30 0 0 1 150 100" stroke="purple" fill="none"/&gt;
+&lt;!-- 大弧 --&gt;
+&lt;path d="M 50 100 A 50 30 0 1 1 150 100" stroke="blue" fill="none"/&gt;
+&lt;!-- 圆形（两个半圆组成） --&gt;
+&lt;path d="M 250 75 A 25 25 0 1 1 250 74" stroke="red" fill="none"/&gt;
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h5>🔄 Z/z - 闭合路径</h5>
+                    <p><strong>作用：</strong>从当前位置画直线回到路径起点，闭合图形</p>
+                    <div class="svg-container">
+                        <svg width="350" height="120" style="border: 1px solid #ccc;">
+                            <!-- 不闭合的三角形 -->
+                            <path d="M 50 20 L 80 80 L 20 80" 
+                                  stroke="#e74c3c" stroke-width="3" fill="none"/>
+                            <text x="30" y="105" font-size="12" fill="#e74c3c">未闭合</text>
+                            
+                            <!-- 闭合的三角形 -->
+                            <path d="M 150 20 L 180 80 L 120 80 Z" 
+                                  stroke="#2ecc71" stroke-width="3" fill="rgba(46,204,113,0.3)"/>
+                            <text x="130" y="105" font-size="12" fill="#2ecc71">已闭合(Z)</text>
+                            
+                            <!-- 复杂图形闭合 -->
+                            <path d="M 250 30 L 280 50 L 270 80 L 230 80 L 220 50 Z" 
+                                  stroke="#9b59b6" stroke-width="3" fill="rgba(155,89,182,0.3)"/>
+                            <text x="230" y="105" font-size="12" fill="#9b59b6">五边形</text>
+                        </svg>
+                    </div>
+                    <div class="code-block">
+&lt;!-- 不闭合的路径 --&gt;
+&lt;path d="M 50 20 L 80 80 L 20 80" stroke="red" fill="none"/&gt;
+
+&lt;!-- 使用Z闭合路径 --&gt;
+&lt;path d="M 150 20 L 180 80 L 120 80 Z" stroke="green" fill="lightgreen"/&gt;
+
+&lt;!-- Z和z效果相同，都是闭合到起点 --&gt;
+&lt;path d="M 250 30 L 280 50 L 270 80 L 230 80 L 220 50 z" 
+      stroke="purple" fill="rgba(155,89,182,0.3)"/&gt;
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <strong>🎨 综合应用示例：</strong>
+                    <div class="svg-container">
+                        <svg width="300" height="150" style="border: 1px solid #ccc;">
+                            <!-- 使用多种命令绘制一朵花 -->
+                            <path d="M 150 75 
+                                     m -20 0 
+                                     Q 130 55, 150 55 
+                                     Q 170 55, 170 75 
+                                     Q 170 95, 150 95 
+                                     Q 130 95, 130 75 
+                                     M 150 75 
+                                     m 0 -20 
+                                     Q 130 55, 130 75 
+                                     Q 130 95, 150 95 
+                                     Q 170 95, 170 75 
+                                     Q 170 55, 150 55" 
+                                  stroke="#e91e63" stroke-width="2" fill="rgba(233,30,99,0.3)"/>
+                            <!-- 花心 -->
+                            <circle cx="150" cy="75" r="8" fill="#ffc107"/>
+                            <!-- 花茎 -->
+                            <path d="M 150 95 Q 145 110, 150 125 Q 155 140, 150 150" 
+                                  stroke="#4caf50" stroke-width="4" fill="none"/>
+                            <!-- 叶子 -->
+                            <path d="M 145 120 Q 130 115, 135 130 Q 140 125, 145 120" 
+                                  stroke="#4caf50" stroke-width="2" fill="rgba(76,175,80,0.5)"/>
+                        </svg>
+                    </div>
+                    <p>这个花朵图案综合使用了 M(移动)、Q(二次贝塞尔曲线)、m(相对移动) 等多种命令。</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2 id="advanced-features">四、高级特性</h2>
+        
+        <h3>4.1 渐变 (Gradients)</h3>
+        <div class="demo-section">
+            <div class="demo-title">线性渐变和径向渐变</div>
+            <div class="demo-content">
+                <div class="svg-container">
+                    <svg width="400" height="200" style="border: 1px solid #ccc;">
+                        <defs>
+                            <linearGradient id="linearGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#45b7d1;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="radialGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:#ffeaa7;stop-opacity:1" />
+                                <stop offset="70%" style="stop-color:#fab1a0;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e17055;stop-opacity:1" />
+                            </radialGradient>
+                        </defs>
+                        <rect x="20" y="20" width="150" height="80" fill="url(#linearGrad)" />
+                        <circle cx="280" cy="60" r="50" fill="url(#radialGrad)" />
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;defs&gt;
+    &lt;linearGradient id="linearGrad" x1="0%" y1="0%" x2="100%" y2="0%"&gt;
+        &lt;stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" /&gt;
+        &lt;stop offset="50%" style="stop-color:#4ecdc4;stop-opacity:1" /&gt;
+        &lt;stop offset="100%" style="stop-color:#45b7d1;stop-opacity:1" /&gt;
+    &lt;/linearGradient&gt;
+    &lt;radialGradient id="radialGrad" cx="50%" cy="50%" r="50%"&gt;
+        &lt;stop offset="0%" style="stop-color:#ffeaa7;stop-opacity:1" /&gt;
+        &lt;stop offset="100%" style="stop-color:#e17055;stop-opacity:1" /&gt;
+    &lt;/radialGradient&gt;
+&lt;/defs&gt;
+&lt;rect x="20" y="20" width="150" height="80" fill="url(#linearGrad)" /&gt;
+&lt;circle cx="280" cy="60" r="50" fill="url(#radialGrad)" /&gt;
+                </div>
+            </div>
+        </div>
+        
+        <h3>4.2 滤镜效果 (Filters)</h3>
+        <div class="demo-section">
+            <div class="demo-title">常用滤镜效果</div>
+            <div class="demo-content">
+                <div class="svg-container">
+                    <svg width="500" height="200" style="border: 1px solid #ccc;">
+                        <defs>
+                            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#333" flood-opacity="0.5"/>
+                            </filter>
+                            <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="2"/>
+                            </filter>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <rect x="20" y="50" width="80" height="50" fill="#3498db" filter="url(#shadow)" />
+                        <circle cx="170" cy="75" r="30" fill="#e74c3c" filter="url(#blur)" />
+                        <rect x="250" y="50" width="80" height="50" fill="#f39c12" filter="url(#glow)" />
+                        <text x="380" y="80" font-family="Arial" font-size="20" fill="#9b59b6" filter="url(#shadow)">SVG Text</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <h2 id="cases">五、实战案例（难度递增）</h2>
+        
+        <h3>案例1：简单图标绘制</h3>
+        <div class="demo-section">
+            <div class="demo-title">难度等级</div>
+            <div class="demo-content">
+                <div class="case-difficulty difficulty-1">⭐ 初级 - 基础图形组合</div>
+                
+                <p><strong>目标：</strong>使用基本图形元素创建一个简单的房子图标</p>
+                
+                <div class="svg-container">
+                    <svg width="200" height="200" viewBox="0 0 200 200" style="border: 1px solid #ccc;">
+                        <!-- 房子主体 -->
+                        <rect x="50" y="100" width="100" height="80" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                        <!-- 屋顶 -->
+                        <polygon points="40,100 100,50 160,100" fill="#DC143C" stroke="#B22222" stroke-width="2"/>
+                        <!-- 门 -->
+                        <rect x="85" y="140" width="30" height="40" fill="#654321" stroke="#4A2C17" stroke-width="1"/>
+                        <!-- 门把手 -->
+                        <circle cx="108" cy="160" r="2" fill="#FFD700"/>
+                        <!-- 窗户 -->
+                        <rect x="60" y="120" width="20" height="20" fill="#87CEEB" stroke="#4682B4" stroke-width="1"/>
+                        <rect x="120" y="120" width="20" height="20" fill="#87CEEB" stroke="#4682B4" stroke-width="1"/>
+                        <!-- 窗户十字 -->
+                        <line x1="70" y1="120" x2="70" y2="140" stroke="#4682B4" stroke-width="1"/>
+                        <line x1="60" y1="130" x2="80" y2="130" stroke="#4682B4" stroke-width="1"/>
+                        <line x1="130" y1="120" x2="130" y2="140" stroke="#4682B4" stroke-width="1"/>
+                        <line x1="120" y1="130" x2="140" y2="130" stroke="#4682B4" stroke-width="1"/>
+                        <!-- 烟囱 -->
+                        <rect x="130" y="60" width="15" height="30" fill="#696969" stroke="#2F4F4F" stroke-width="1"/>
+                        <!-- 烟 -->
+                        <circle cx="140" cy="50" r="3" fill="#D3D3D3" opacity="0.7"/>
+                        <circle cx="145" cy="45" r="2" fill="#D3D3D3" opacity="0.5"/>
+                        <circle cx="142" cy="40" r="2" fill="#D3D3D3" opacity="0.3"/>
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;svg width="200" height="200" viewBox="0 0 200 200"&gt;
+    &lt;!-- 房子主体 --&gt;
+    &lt;rect x="50" y="100" width="100" height="80" fill="#8B4513" stroke="#654321" stroke-width="2"/&gt;
+    &lt;!-- 屋顶 --&gt;
+    &lt;polygon points="40,100 100,50 160,100" fill="#DC143C" stroke="#B22222" stroke-width="2"/&gt;
+    &lt;!-- 门 --&gt;
+    &lt;rect x="85" y="140" width="30" height="40" fill="#654321"/&gt;
+    &lt;circle cx="108" cy="160" r="2" fill="#FFD700"/&gt;
+    &lt;!-- 窗户 --&gt;
+    &lt;rect x="60" y="120" width="20" height="20" fill="#87CEEB" stroke="#4682B4"/&gt;
+    &lt;rect x="120" y="120" width="20" height="20" fill="#87CEEB" stroke="#4682B4"/&gt;
+    &lt;!-- 更多细节... --&gt;
+&lt;/svg&gt;
+                </div>
+                
+                <div class="tip">
+                    <strong>学习要点：</strong>
+                    <ul>
+                        <li>基本图形元素的使用：rect, polygon, circle, line</li>
+                        <li>坐标系统的理解</li>
+                        <li>颜色和描边的应用</li>
+                        <li>图层叠加的概念</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <h3>案例2：路径绘制复杂图形</h3>
+        <div class="demo-section">
+            <div class="demo-title">难度等级</div>
+            <div class="demo-content">
+                <div class="case-difficulty difficulty-2">⭐⭐ 中级 - 路径和曲线</div>
+                
+                <p><strong>目标：</strong>使用path元素绘制一个爱心图形，学习贝塞尔曲线</p>
+                
+                <div class="svg-container">
+                    <svg width="200" height="200" viewBox="0 0 200 200" style="border: 1px solid #ccc;">
+                        <defs>
+                            <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#ff8a80;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff5722;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="heartShadow">
+                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#333" flood-opacity="0.3"/>
+                            </filter>
+                        </defs>
+                        
+                        <!-- 爱心路径 -->
+                        <path d="M100,150 
+                                 C100,150 70,120 70,95 
+                                 C70,80 80,70 95,70 
+                                 C100,75 100,75 100,75
+                                 C100,75 100,75 105,70
+                                 C120,70 130,80 130,95
+                                 C130,120 100,150 100,150 Z" 
+                              fill="url(#heartGradient)" 
+                              stroke="#d63031" 
+                              stroke-width="2"
+                              filter="url(#heartShadow)"/>
+                        
+                        <!-- 装饰性小爱心 -->
+                        <path d="M60,40 C60,40 50,30 50,25 C50,20 55,15 60,15 C62,17 62,17 62,17 C62,17 62,17 64,15 C69,15 74,20 74,25 C74,30 62,40 62,40 Z" 
+                              fill="#ff7675" opacity="0.8"/>
+                        
+                        <path d="M140,180 C140,180 135,175 135,172 C135,169 137,167 140,167 C141,168 141,168 141,168 C141,168 141,168 142,167 C145,167 147,169 147,172 C147,175 141,180 141,180 Z" 
+                              fill="#fd79a8" opacity="0.6"/>
+                        
+                        <!-- 闪光效果 -->
+                        <g opacity="0.7">
+                            <path d="M85,85 L90,95 L80,95 Z" fill="#fff" opacity="0.8"/>
+                            <path d="M115,100 L120,110 L110,110 Z" fill="#fff" opacity="0.6"/>
+                        </g>
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;svg width="200" height="200" viewBox="0 0 200 200"&gt;
+    &lt;defs&gt;
+        &lt;linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%"&gt;
+            &lt;stop offset="0%" style="stop-color:#ff6b9d" /&gt;
+            &lt;stop offset="100%" style="stop-color:#ff5722" /&gt;
+        &lt;/linearGradient&gt;
+    &lt;/defs&gt;
+    
+    &lt;!-- 爱心主体使用贝塞尔曲线 --&gt;
+    &lt;path d="M100,150 
+             C100,150 70,120 70,95 
+             C70,80 80,70 95,70 
+             C100,75 100,75 100,75
+             C100,75 100,75 105,70
+             C120,70 130,80 130,95
+             C130,120 100,150 100,150 Z" 
+          fill="url(#heartGradient)" 
+          stroke="#d63031" 
+          stroke-width="2"/&gt;
+&lt;/svg&gt;
+                </div>
+                
+                <div class="tip">
+                    <strong>学习要点：</strong>
+                    <ul>
+                        <li>path元素的d属性语法</li>
+                        <li>贝塞尔曲线的控制点概念</li>
+                        <li>渐变填充的应用</li>
+                        <li>滤镜效果的使用</li>
+                        <li>图形的组合和层次</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <h3>案例3：动态图表绘制</h3>
+        <div class="demo-section">
+            <div class="demo-title">难度等级</div>
+            <div class="demo-content">
+                <div class="case-difficulty difficulty-3">⭐⭐⭐ 中高级 - 数据可视化</div>
+                
+                <p><strong>目标：</strong>创建一个动态的饼图，展示数据可视化能力</p>
+                
+                <div class="interactive-demo">
+                    <div class="controls">
+                        <label>数据1: <input type="range" id="data1" min="10" max="50" value="30" oninput="updateChart()"></label>
+                        <label>数据2: <input type="range" id="data2" min="10" max="50" value="25" oninput="updateChart()"></label>
+                        <label>数据3: <input type="range" id="data3" min="10" max="50" value="20" oninput="updateChart()"></label>
+                        <label>数据4: <input type="range" id="data4" min="10" max="50" value="15" oninput="updateChart()"></label>
+                    </div>
+                    
+                    <div class="svg-container">
+                        <svg id="pieChart" width="400" height="300" viewBox="0 0 400 300" style="border: 1px solid #ccc;">
+                            <defs>
+                                <filter id="pieFilter">
+                                    <feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            
+                            <!-- 图表标题 -->
+                            <text x="200" y="25" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#2c3e50">动态饼图示例</text>
+                            
+                            <!-- 饼图容器 -->
+                            <g id="pieSlices" transform="translate(150,150)"></g>
+                            
+                            <!-- 图例 -->
+                            <g id="legend" transform="translate(280,80)"></g>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+&lt;svg width="400" height="300" viewBox="0 0 400 300"&gt;
+    &lt;!-- 饼图切片计算 --&gt;
+    &lt;script&gt;
+    function createPieSlice(startAngle, endAngle, radius, color) {
+        const x1 = Math.cos(startAngle) * radius;
+        const y1 = Math.sin(startAngle) * radius;
+        const x2 = Math.cos(endAngle) * radius;
+        const y2 = Math.sin(endAngle) * radius;
+        
+        const largeArc = endAngle - startAngle &gt; Math.PI ? 1 : 0;
+        
+        return `M 0 0 L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+    }
+    &lt;/script&gt;
+    
+    &lt;!-- 动态生成的饼图切片 --&gt;
+    &lt;g transform="translate(150,150)"&gt;
+        &lt;path d="..." fill="#3498db" filter="url(#pieFilter)"/&gt;
+        &lt;path d="..." fill="#e74c3c" filter="url(#pieFilter)"/&gt;
+        &lt;!-- 更多切片... --&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;
+                </div>
+                
+                <script>
+                function updateChart() {
+                    const data = [
+                        { value: parseInt(document.getElementById('data1').value), color: '#3498db', label: '产品A' },
+                        { value: parseInt(document.getElementById('data2').value), color: '#e74c3c', label: '产品B' },
+                        { value: parseInt(document.getElementById('data3').value), color: '#2ecc71', label: '产品C' },
+                        { value: parseInt(document.getElementById('data4').value), color: '#f39c12', label: '产品D' }
+                    ];
+                    
+                    const total = data.reduce((sum, item) => sum + item.value, 0);
+                    const radius = 60;
+                    
+                    let currentAngle = -Math.PI / 2; // 从顶部开始
+                    
+                    const slicesContainer = document.getElementById('pieSlices');
+                    const legendContainer = document.getElementById('legend');
+                    
+                    slicesContainer.innerHTML = '';
+                    legendContainer.innerHTML = '';
+                    
+                    data.forEach((item, index) => {
+                        const sliceAngle = (item.value / total) * 2 * Math.PI;
+                        const endAngle = currentAngle + sliceAngle;
+                        
+                        // 创建饼图切片
+                        const x1 = Math.cos(currentAngle) * radius;
+                        const y1 = Math.sin(currentAngle) * radius;
+                        const x2 = Math.cos(endAngle) * radius;
+                        const y2 = Math.sin(endAngle) * radius;
+                        
+                        const largeArc = sliceAngle > Math.PI ? 1 : 0;
+                        
+                        const pathData = `M 0 0 L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                        
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', pathData);
+                        path.setAttribute('fill', item.color);
+                        path.setAttribute('filter', 'url(#pieFilter)');
+                        path.setAttribute('opacity', '0.9');
+                        path.style.cursor = 'pointer';
+                        
+                        // 添加悬停效果
+                        path.addEventListener('mouseenter', function() {
+                            this.setAttribute('transform', 'scale(1.05)');
+                            this.setAttribute('opacity', '1');
+                        });
+                        
+                        path.addEventListener('mouseleave', function() {
+                            this.setAttribute('transform', 'scale(1)');
+                            this.setAttribute('opacity', '0.9');
+                        });
+                        
+                        slicesContainer.appendChild(path);
+                        
+                        // 创建图例
+                        const legendItem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                        
+                        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        rect.setAttribute('x', '0');
+                        rect.setAttribute('y', index * 25);
+                        rect.setAttribute('width', '15');
+                        rect.setAttribute('height', '15');
+                        rect.setAttribute('fill', item.color);
+                        
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', '20');
+                        text.setAttribute('y', index * 25 + 12);
+                        text.setAttribute('font-family', 'Arial');
+                        text.setAttribute('font-size', '12');
+                        text.setAttribute('fill', '#2c3e50');
+                        text.textContent = `${item.label}: ${item.value} (${(item.value/total*100).toFixed(1)}%)`;
+                        
+                        legendItem.appendChild(rect);
+                        legendItem.appendChild(text);
+                        legendContainer.appendChild(legendItem);
+                        
+                        currentAngle = endAngle;
+                    });
+                }
+                
+                // 初始化图表
+                updateChart();
+                </script>
+                
+                <div class="tip">
+                    <strong>学习要点：</strong>
+                    <ul>
+                        <li>数学计算在SVG中的应用（三角函数）</li>
+                        <li>动态生成SVG元素</li>
+                        <li>JavaScript与SVG的交互</li>
+                        <li>事件处理和动画效果</li>
+                        <li>数据可视化的基本原理</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <h3>案例4：复杂动画效果</h3>
+        <div class="demo-section">
+            <div class="demo-title">难度等级</div>
+            <div class="demo-content">
+                <div class="case-difficulty difficulty-4">⭐⭐⭐⭐ 高级 - 动画和变换</div>
+                
+                <p><strong>目标：</strong>创建一个复杂的太阳系动画，展示SVG动画能力</p>
+                
+                <div class="svg-container">
+                    <svg width="500" height="400" viewBox="0 0 500 400" style="border: 1px solid #ccc; background: #000;">
+                        <defs>
+                            <!-- 太阳渐变 -->
+                            <radialGradient id="sunGradient" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:#ffeb3b;stop-opacity:1" />
+                                <stop offset="70%" style="stop-color:#ff9800;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff5722;stop-opacity:1" />
+                            </radialGradient>
+                            
+                            <!-- 地球渐变 -->
+                            <radialGradient id="earthGradient" cx="30%" cy="30%" r="70%">
+                                <stop offset="0%" style="stop-color:#81c784;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#4fc3f7;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#1976d2;stop-opacity:1" />
+                            </radialGradient>
+                            
+                            <!-- 月球渐变 -->
+                            <radialGradient id="moonGradient" cx="30%" cy="30%" r="70%">
+                                <stop offset="0%" style="stop-color:#f5f5f5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#9e9e9e;stop-opacity:1" />
+                            </radialGradient>
+                            
+                            <!-- 发光效果 -->
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            
+                            <!-- 星星形状 -->
+                            <g id="star">
+                                <polygon points="0,-4 1,-1 4,-1 2,1 3,4 0,2 -3,4 -2,1 -4,-1 -1,-1" fill="#fff" opacity="0.8"/>
+                            </g>
+                        </defs>
+                        
+                        <!-- 背景星星 -->
+                        <g id="stars">
+                            <use href="#star" x="50" y="50">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="20s" repeatCount="indefinite"/>
+                            </use>
+                            <use href="#star" x="150" y="80">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="25s" repeatCount="indefinite"/>
+                            </use>
+                            <use href="#star" x="400" y="100">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="15s" repeatCount="indefinite"/>
+                            </use>
+                            <use href="#star" x="450" y="300">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="30s" repeatCount="indefinite"/>
+                            </use>
+                            <use href="#star" x="80" y="350">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="18s" repeatCount="indefinite"/>
+                            </use>
+                        </g>
+                        
+                        <!-- 太阳 -->
+                        <g transform="translate(250,200)">
+                            <circle r="25" fill="url(#sunGradient)" filter="url(#glow)">
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                            </circle>
+                            
+                            <!-- 太阳光芒 -->
+                            <g opacity="0.7">
+                                <line x1="-35" y1="0" x2="-30" y2="0" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="35" y1="0" x2="30" y2="0" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="0" y1="-35" x2="0" y2="-30" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="0" y1="35" x2="0" y2="30" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="-25" y1="-25" x2="-21" y2="-21" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="25" y1="25" x2="21" y2="21" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="25" y1="-25" x2="21" y2="-21" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                                <line x1="-25" y1="25" x2="-21" y2="21" stroke="#ffeb3b" stroke-width="2">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="10s" repeatCount="indefinite"/>
+                                </line>
+                            </g>
+                        </g>
+                        
+                        <!-- 地球轨道 -->
+                        <circle cx="250" cy="200" r="100" fill="none" stroke="#333" stroke-width="1" opacity="0.3" stroke-dasharray="2,2"/>
+                        
+                        <!-- 地球系统 -->
+                        <g transform="translate(250,200)">
+                            <g>
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="20s" repeatCount="indefinite"/>
+                                
+                                <!-- 地球 -->
+                                <g transform="translate(100,0)">
+                                    <circle r="12" fill="url(#earthGradient)">
+                                        <animateTransform attributeName="transform" type="rotate" values="0;360" dur="5s" repeatCount="indefinite"/>
+                                    </circle>
+                                    
+                                    <!-- 月球轨道 -->
+                                    <circle r="20" fill="none" stroke="#666" stroke-width="0.5" opacity="0.3"/>
+                                    
+                                    <!-- 月球 -->
+                                    <g>
+                                        <animateTransform attributeName="transform" type="rotate" values="0;360" dur="3s" repeatCount="indefinite"/>
+                                        <circle cx="20" cy="0" r="3" fill="url(#moonGradient)"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                        
+                        <!-- 火星轨道 -->
+                        <circle cx="250" cy="200" r="150" fill="none" stroke="#333" stroke-width="1" opacity="0.3" stroke-dasharray="2,2"/>
+                        
+                        <!-- 火星 -->
+                        <g transform="translate(250,200)">
+                            <g>
+                                <animateTransform attributeName="transform" type="rotate" values="0;360" dur="35s" repeatCount="indefinite"/>
+                                <circle cx="150" cy="0" r="8" fill="#d32f2f">
+                                    <animateTransform attributeName="transform" type="rotate" values="0;360" dur="7s" repeatCount="indefinite"/>
+                                </circle>
+                            </g>
+                        </g>
+                        
+                        <!-- 标题 -->
+                        <text x="250" y="30" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#fff">SVG太阳系动画</text>
+                        
+                        <!-- 图例 -->
+                        <g transform="translate(20,320)">
+                            <circle cx="10" cy="10" r="8" fill="url(#sunGradient)"/>
+                            <text x="25" y="15" font-family="Arial" font-size="12" fill="#fff">太阳</text>
+                            
+                            <circle cx="10" cy="30" r="5" fill="url(#earthGradient)"/>
+                            <text x="25" y="35" font-family="Arial" font-size="12" fill="#fff">地球</text>
+                            
+                            <circle cx="10" cy="50" r="3" fill="url(#moonGradient)"/>
+                            <text x="25" y="55" font-family="Arial" font-size="12" fill="#fff">月球</text>
+                            
+                            <circle cx="10" cy="70" r="4" fill="#d32f2f"/>
+                            <text x="25" y="75" font-family="Arial" font-size="12" fill="#fff">火星</text>
+                        </g>
+                    </svg>
+                </div>
+                
+                <div class="code-block">
+&lt;svg width="500" height="400" viewBox="0 0 500 400"&gt;
+    &lt;defs&gt;
+        &lt;!-- 渐变定义 --&gt;
+        &lt;radialGradient id="sunGradient"&gt;
+            &lt;stop offset="0%" style="stop-color:#ffeb3b" /&gt;
+            &lt;stop offset="100%" style="stop-color:#ff5722" /&gt;
+        &lt;/radialGradient&gt;
+        
+        &lt;!-- 发光滤镜 --&gt;
+        &lt;filter id="glow"&gt;
+            &lt;feGaussianBlur stdDeviation="4" result="coloredBlur"/&gt;
+            &lt;feMerge&gt;
+                &lt;feMergeNode in="coloredBlur"/&gt;
+                &lt;feMergeNode in="SourceGraphic"/&gt;
+            &lt;/feMerge&gt;
+        &lt;/filter&gt;
+    &lt;/defs&gt;
+    
+    &lt;!-- 太阳（自转动画） --&gt;
+    &lt;g transform="translate(250,200)"&gt;
+        &lt;circle r="25" fill="url(#sunGradient)" filter="url(#glow)"&gt;
+            &lt;animateTransform attributeName="transform" 
+                            type="rotate" 
+                            values="0;360" 
+                            dur="10s" 
+                            repeatCount="indefinite"/&gt;
+        &lt;/circle&gt;
+    &lt;/g&gt;
+    
+    &lt;!-- 地球系统（公转动画） --&gt;
+    &lt;g transform="translate(250,200)"&gt;
+        &lt;g&gt;
+            &lt;animateTransform attributeName="transform" 
+                            type="rotate" 
+                            values="0;360" 
+                            dur="20s" 
+                            repeatCount="indefinite"/&gt;
+            &lt;circle cx="100" cy="0" r="12" fill="url(#earthGradient)"/&gt;
+        &lt;/g&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;
+                </div>
+                
+                <div class="tip">
+                    <strong>学习要点：</strong>
+                    <ul>
+                        <li>SVG动画元素：animateTransform, animate</li>
+                        <li>复杂的变换组合和嵌套</li>
+                        <li>滤镜效果的高级应用</li>
+                        <li>多层动画的协调</li>
+                        <li>性能优化考虑</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
