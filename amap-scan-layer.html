@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高德地图 - 自定义扫描图层</title>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=youkey"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .map-container {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+        }
+
+        .controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .controls h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.stop {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn.stop:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .status {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 20px;
+        }
+
+        .status h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗺️ 高德地图自定义扫描图层</h1>
+        <p>体验动态扫描效果，支持多种扫描模式和自定义参数</p>
+    </div>
+
+    <div class="container">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+
+        <div class="controls">
+            <h3>🎛️ 扫描控制</h3>
+            
+            <div class="control-group">
+                <label>扫描模式</label>
+                <select id="scanMode">
+                    <option value="radar">雷达扫描</option>
+                    <option value="ripple">水波纹扫描</option>
+                    <option value="sector">扇形扫描</option>
+                    <option value="pulse">脉冲扫描</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>扫描半径 (米)</label>
+                <input type="range" id="scanRadius" min="500" max="5000" value="2000" step="100">
+                <span id="radiusValue">2000m</span>
+            </div>
+
+            <div class="control-group">
+                <label>扫描速度</label>
+                <input type="range" id="scanSpeed" min="1" max="10" value="5" step="1">
+                <span id="speedValue">5</span>
+            </div>
+
+            <div class="control-group">
+                <label>透明度</label>
+                <input type="range" id="opacity" min="0.1" max="1" value="0.6" step="0.1">
+                <span id="opacityValue">0.6</span>
+            </div>
+
+            <div class="control-group">
+                <label>扫描颜色</label>
+                <div class="color-picker">
+                    <div class="color-option active" style="background: #00ff00" data-color="#00ff00"></div>
+                    <div class="color-option" style="background: #ff0000" data-color="#ff0000"></div>
+                    <div class="color-option" style="background: #0080ff" data-color="#0080ff"></div>
+                    <div class="color-option" style="background: #ff8000" data-color="#ff8000"></div>
+                    <div class="color-option" style="background: #ff00ff" data-color="#ff00ff"></div>
+                </div>
+            </div>
+
+            <button class="btn" id="startScan">🎯 开始扫描</button>
+            <button class="btn stop" id="stopScan">⏹️ 停止扫描</button>
+            <button class="btn" id="changeCenter">📍 更换中心点</button>
+
+            <div class="status">
+                <h4>📊 状态信息</h4>
+                <p id="statusText">准备就绪</p>
+                <p id="centerInfo">中心点: 北京市</p>
+                <p id="scanInfo">扫描状态: 未开始</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ScanLayer {
+            constructor(map, options = {}) {
+                this.map = map;
+                this.center = options.center || [116.397428, 39.90923]; // 默认北京
+                this.radius = options.radius || 2000;
+                this.color = options.color || '#00ff00';
+                this.opacity = options.opacity || 0.6;
+                this.speed = options.speed || 5;
+                this.mode = options.mode || 'radar';
+                
+                this.isScanning = false;
+                this.animationId = null;
+                this.startTime = 0;
+                this.canvas = null;
+                this.ctx = null;
+                
+                this.initCanvas();
+            }
+
+            initCanvas() {
+                // 先创建canvas
+                this.createCanvas();
+                
+                // 监听地图变化
+                this.map.on('mapmove', () => this.render());
+                this.map.on('zoomchange', () => this.render());
+                this.map.on('resize', () => this.render());
+            }
+
+            createCanvas() {
+                const size = this.map.getSize();
+                const canvas = document.createElement('canvas');
+                canvas.width = size.width;
+                canvas.height = size.height;
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.zIndex = '120';
+                
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                
+                // 添加到地图容器
+                this.map.getContainer().appendChild(canvas);
+                
+                return canvas;
+            }
+
+            startScan() {
+                if (this.isScanning) return;
+                
+                this.isScanning = true;
+                this.startTime = Date.now();
+                
+                this.animate();
+            }
+
+            stopScan() {
+                this.isScanning = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                if (this.ctx) {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+
+            animate() {
+                if (!this.isScanning) return;
+                
+                this.render();
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+
+            render() {
+                if (!this.ctx || !this.isScanning) return;
+                
+                const size = this.map.getSize();
+                this.canvas.width = size.width;
+                this.canvas.height = size.height;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 将地理坐标转换为屏幕坐标
+                const centerPixel = this.map.lngLatToContainer(this.center);
+                const radiusPixel = this.getRadiusInPixels();
+                
+                const elapsed = (Date.now() - this.startTime) / 1000;
+                
+                switch (this.mode) {
+                    case 'radar':
+                        this.drawRadarScan(centerPixel, radiusPixel, elapsed);
+                        break;
+                    case 'ripple':
+                        this.drawRippleScan(centerPixel, radiusPixel, elapsed);
+                        break;
+                    case 'sector':
+                        this.drawSectorScan(centerPixel, radiusPixel, elapsed);
+                        break;
+                    case 'pulse':
+                        this.drawPulseScan(centerPixel, radiusPixel, elapsed);
+                        break;
+                }
+            }
+
+            getRadiusInPixels() {
+                // 计算地理半径对应的像素半径
+                const bounds = this.map.getBounds();
+                const center = this.map.getCenter();
+                const zoom = this.map.getZoom();
+                
+                // 简化计算：使用地图缩放级别来估算像素半径
+                const metersPerPixel = 156543.03392 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, zoom);
+                return this.radius / metersPerPixel;
+            }
+
+            drawRadarScan(center, radius, elapsed) {
+                const ctx = this.ctx;
+                const angle = (elapsed * this.speed * 45) % 360; // 每秒旋转speed*45度
+                
+                ctx.save();
+                
+                // 绘制最外圆的背景填充
+                ctx.globalAlpha = this.opacity * 0.1;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 绘制涟漪效果
+                const rippleCount = 3;
+                const ripplePeriod = 4; // 4秒一个周期
+                for (let i = 0; i < rippleCount; i++) {
+                    const offset = (i / rippleCount) * ripplePeriod;
+                    const t = ((elapsed + offset) % ripplePeriod) / ripplePeriod;
+                    const rippleRadius = radius * t; // 从0%扩散到100%
+                    const rippleAlpha = this.opacity * 0.8 * (1 - t);
+                    
+                    if (rippleAlpha > 0 && rippleRadius <= radius) {
+                        ctx.globalAlpha = rippleAlpha;
+                        ctx.strokeStyle = this.color;
+                        ctx.lineWidth = 2 * (1 - t) + 0.5;
+                        ctx.beginPath();
+                        ctx.arc(center.x, center.y, rippleRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+                
+                // 绘制多层同心圆背景
+                // const circleCount = 4;
+                // for (let i = 1; i <= circleCount; i++) {
+                //     const currentRadius = (radius / circleCount) * i;
+                //     // 修复透明度：内圈更不透明，外圈更透明
+                //     const alpha = this.opacity * 0.4 * (i / circleCount);
+                    
+                //     ctx.globalAlpha = alpha;
+                //     ctx.strokeStyle = this.color;
+                //     ctx.lineWidth = 1;
+                //     ctx.beginPath();
+                //     ctx.arc(center.x, center.y, currentRadius, 0, Math.PI * 2);
+                //     ctx.stroke();
+                // }
+                
+                // 绘制外圈主圆环
+                ctx.globalAlpha = this.opacity * 0.8;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // 绘制扫描扇形区域（更大的扇形角度）
+                const sweepAngle = 90; // 扇形角度
+                const startAngle = (angle - sweepAngle - 90) * Math.PI / 180;
+                const endAngle = (angle - 90) * Math.PI / 180;
+                
+                // 创建扇形渐变
+                const sweepGradient = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, radius);
+                sweepGradient.addColorStop(0, this.color + 'AA');
+                sweepGradient.addColorStop(0.3, this.color + '66');
+                sweepGradient.addColorStop(0.7, this.color + '33');
+                sweepGradient.addColorStop(1, this.color + '00');
+                
+                ctx.globalAlpha = this.opacity * 0.8;
+                ctx.fillStyle = sweepGradient;
+                ctx.beginPath();
+                ctx.moveTo(center.x, center.y);
+                ctx.arc(center.x, center.y, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fill();
+                
+                // 绘制主扫描线
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.moveTo(center.x, center.y);
+                const mainEndX = center.x + Math.cos((angle - 90) * Math.PI / 180) * radius;
+                const mainEndY = center.y + Math.sin((angle - 90) * Math.PI / 180) * radius;
+                ctx.lineTo(mainEndX, mainEndY);
+                ctx.stroke();
+                
+                // 重置阴影
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
+                // 绘制中心点
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 绘制中心点光晕
+                const centerGradient = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, 15);
+                centerGradient.addColorStop(0, this.color + '88');
+                centerGradient.addColorStop(1, this.color + '00');
+                ctx.globalAlpha = this.opacity * 0.6;
+                ctx.fillStyle = centerGradient;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 绘制径向网格线
+                ctx.globalAlpha = this.opacity * 0.2;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 8; i++) {
+                    const gridAngle = (i * 45 - 90) * Math.PI / 180;
+                    ctx.beginPath();
+                    ctx.moveTo(center.x, center.y);
+                    ctx.lineTo(
+                        center.x + Math.cos(gridAngle) * radius,
+                        center.y + Math.sin(gridAngle) * radius
+                    );
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+
+            drawRippleScan(center, radius, elapsed) {
+                const ctx = this.ctx;
+                const rippleCount = 3;
+                const period = 3; // 3秒一个周期
+                
+                ctx.save();
+                
+                for (let i = 0; i < rippleCount; i++) {
+                    const offset = (i / rippleCount) * period;
+                    const t = ((elapsed + offset) % period) / period;
+                    const currentRadius = radius * t;
+                    const alpha = this.opacity * (1 - t);
+                    
+                    if (alpha > 0) {
+                        ctx.globalAlpha = alpha;
+                        ctx.strokeStyle = this.color;
+                        ctx.lineWidth = 4 * (1 - t) + 1;
+                        ctx.beginPath();
+                        ctx.arc(center.x, center.y, currentRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+                
+                ctx.restore();
+            }
+
+            drawSectorScan(center, radius, elapsed) {
+                const ctx = this.ctx;
+                const angle = (elapsed * this.speed * 45) % 360; // 每秒旋转speed*45度
+                const sectorAngle = 60; // 扇形角度
+                
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                
+                // 创建扇形渐变
+                const gradient = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, radius);
+                gradient.addColorStop(0, this.color + 'CC');
+                gradient.addColorStop(0.7, this.color + '66');
+                gradient.addColorStop(1, this.color + '00');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(center.x, center.y);
+                ctx.arc(center.x, center.y, radius, 
+                    (angle - sectorAngle/2 - 90) * Math.PI / 180, 
+                    (angle + sectorAngle/2 - 90) * Math.PI / 180);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            drawPulseScan(center, radius, elapsed) {
+                const ctx = this.ctx;
+                const period = 3; // 3秒一个周期
+                const pulseCount = 3; // 同时显示3个脉冲
+                
+                ctx.save();
+                
+                // 绘制外圈边界
+                ctx.globalAlpha = this.opacity * 0.6;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // 绘制多个脉冲波
+                for (let i = 0; i < pulseCount; i++) {
+                    const offset = (i / pulseCount) * period;
+                    const t = ((elapsed * this.speed / 5 + offset) % period) / period;
+                    const pulseRadius = radius * t;
+                    const alpha = this.opacity * (1 - t) * 0.8;
+                    
+                    if (alpha > 0 && pulseRadius > 0) {
+                        // 绘制脉冲圆环
+                        ctx.globalAlpha = alpha;
+                        ctx.strokeStyle = this.color;
+                        ctx.lineWidth = 3 * (1 - t) + 1;
+                        ctx.beginPath();
+                        ctx.arc(center.x, center.y, pulseRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+                        
+                        // 绘制脉冲填充
+                        const gradient = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, pulseRadius);
+                        gradient.addColorStop(0, this.color + '00');
+                        gradient.addColorStop(0.7, this.color + Math.floor(alpha * 255 / 2).toString(16).padStart(2, '0'));
+                        gradient.addColorStop(1, this.color + '00');
+                        
+                        ctx.globalAlpha = alpha * 0.3;
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(center.x, center.y, pulseRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                // 绘制中心点
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            updateOptions(options) {
+                Object.assign(this, options);
+                if (this.isScanning) {
+                    this.render();
+                }
+            }
+
+            setCenter(lngLat) {
+                this.center = lngLat;
+                if (this.isScanning) {
+                    this.render();
+                }
+            }
+
+            destroy() {
+                this.stopScan();
+                if (this.canvas && this.canvas.parentNode) {
+                    this.canvas.parentNode.removeChild(this.canvas);
+                }
+            }
+        }
+
+        // 初始化地图和扫描图层
+        let map, scanLayer;
+        let currentColor = '#00ff00';
+
+        function initMap() {
+            // 请替换为您的高德地图API Key
+            map = new AMap.Map('map', {
+                zoom: 12,
+                center: [116.397428, 39.90923], // 北京
+                mapStyle: 'amap://styles/dark', // 使用暗色主题
+                features: ['bg', 'road', 'building']
+            });
+
+            // 创建扫描图层
+            scanLayer = new ScanLayer(map, {
+                center: [116.397428, 39.90923],
+                radius: 2000,
+                color: currentColor,
+                opacity: 0.6,
+                speed: 5,
+                mode: 'radar'
+            });
+
+            // 添加地图点击事件
+            map.on('click', function(e) {
+                const lngLat = [e.lnglat.lng, e.lnglat.lat];
+                scanLayer.setCenter(lngLat);
+                updateCenterInfo(lngLat);
+            });
+        }
+
+        function updateCenterInfo(lngLat) {
+            const centerInfo = document.getElementById('centerInfo');
+            centerInfo.textContent = `中心点: ${lngLat[0].toFixed(6)}, ${lngLat[1].toFixed(6)}`;
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
+        }
+
+        function updateScanInfo(status) {
+            document.getElementById('scanInfo').textContent = `扫描状态: ${status}`;
+        }
+
+        // 控件事件绑定
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否有高德地图API
+            if (typeof AMap === 'undefined') {
+                alert('请先配置高德地图API Key！\n请在HTML文件中将YOUR_API_KEY替换为您的实际API Key。');
+                return;
+            }
+
+            initMap();
+
+            // 扫描模式切换
+            document.getElementById('scanMode').addEventListener('change', function(e) {
+                scanLayer.updateOptions({ mode: e.target.value });
+                updateStatus(`切换到${e.target.options[e.target.selectedIndex].text}模式`);
+            });
+
+            // 半径控制
+            const radiusSlider = document.getElementById('scanRadius');
+            const radiusValue = document.getElementById('radiusValue');
+            radiusSlider.addEventListener('input', function(e) {
+                const radius = parseInt(e.target.value);
+                scanLayer.updateOptions({ radius });
+                radiusValue.textContent = radius + 'm';
+            });
+
+            // 速度控制
+            const speedSlider = document.getElementById('scanSpeed');
+            const speedValue = document.getElementById('speedValue');
+            speedSlider.addEventListener('input', function(e) {
+                const speed = parseInt(e.target.value);
+                scanLayer.updateOptions({ speed });
+                speedValue.textContent = speed;
+            });
+
+            // 透明度控制
+            const opacitySlider = document.getElementById('opacity');
+            const opacityValue = document.getElementById('opacityValue');
+            opacitySlider.addEventListener('input', function(e) {
+                const opacity = parseFloat(e.target.value);
+                scanLayer.updateOptions({ opacity });
+                opacityValue.textContent = opacity;
+            });
+
+            // 颜色选择
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    currentColor = this.dataset.color;
+                    scanLayer.updateOptions({ color: currentColor });
+                    updateStatus(`颜色已更改为 ${currentColor}`);
+                });
+            });
+
+            // 开始扫描
+            document.getElementById('startScan').addEventListener('click', function() {
+                scanLayer.startScan();
+                updateStatus('扫描已开始');
+                updateScanInfo('进行中');
+            });
+
+            // 停止扫描
+            document.getElementById('stopScan').addEventListener('click', function() {
+                scanLayer.stopScan();
+                updateStatus('扫描已停止');
+                updateScanInfo('已停止');
+            });
+
+            // 更换中心点
+            document.getElementById('changeCenter').addEventListener('click', function() {
+                const cities = [
+                    { name: '上海', lngLat: [121.473701, 31.230416] },
+                    { name: '广州', lngLat: [113.264434, 23.129162] },
+                    { name: '深圳', lngLat: [114.085947, 22.547] },
+                    { name: '杭州', lngLat: [120.153576, 30.287459] },
+                    { name: '成都', lngLat: [104.065735, 30.659462] },
+                    { name: '西安', lngLat: [108.948024, 34.263161] }
+                ];
+                
+                const randomCity = cities[Math.floor(Math.random() * cities.length)];
+                map.setCenter(randomCity.lngLat);
+                scanLayer.setCenter(randomCity.lngLat);
+                updateCenterInfo(randomCity.lngLat);
+                updateStatus(`已切换到${randomCity.name}`);
+            });
+
+            updateStatus('地图加载完成，点击地图设置扫描中心点');
+        });
+    </script>
+</body>
+</html>
