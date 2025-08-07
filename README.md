@@ -20,6 +20,15 @@
 - 包含 `:nth-last-child()` 倒序选择器的应用
 - 通过不同颜色直观展示各选择器的作用效果
 
+#### `css-transition-tutorial.html`
+**CSS Transition 过渡动画完整教程**
+- 详细解释 CSS transition 属性的语法和工作原理
+- 包含 6 个实用案例：基础过渡、display属性问题与抖动、初始值缺失、auto值处理、CSS Grid过渡、复杂动画效果
+- 深入分析常见问题：display属性无法过渡、抖动效果产生原因、height: auto 处理方案
+- 提供多种 auto 值替代方案：max-height技巧、transform: scaleY()、CSS Grid、JavaScript辅助等
+- 包含最佳实践指南：性能优化、可访问性、硬件加速等
+- 现代化交互式演示界面，所有效果可实时预览
+
 #### `margin-collapse-and-bfc.html`
 **CSS Margin 重叠与 BFC 详解**
 - 详细解释 CSS margin 重叠（collapse）现象
